@@ -8,37 +8,43 @@ include "./body_hash_regex.circom";
 include "./twitter_reset_regex.circom";
 include "./base64.circom";
 
-template EmailVerify(max_header_bytes, max_body_bytes, n, k) {
+// encoded with k registers of n bits each
+template JWTVerify(max_header_bytes, max_body_bytes, n, k) {
     // max_num_bytes must be a multiple of 64
     var max_packed_bytes = (max_header_bytes - 1) \ 7 + 1; // ceil(max_num_bytes / 7)
-    signal input in_padded[max_header_bytes]; // prehashed email data, includes up to 512 + 64? bytes of padding pre SHA256, and padded with lots of 0s at end after the length
+    // in_padded is the email header + hashed body
+    // signal input in_padded[max_header_bytes]; // prehashed email data, includes up to 512 + 64? bytes of padding pre SHA256, and padded with lots of 0s at end after the length
+    signal input encoded_header[k];
+    signal input encoded_payload[k];
     signal input modulus[k]; // rsa pubkey, verified with smart contract + optional oracle
     signal input signature[k];
-    signal input in_len_padded_bytes; // length of in email data including the padding, which will inform the sha256 block length
+    // signal input in_len_padded_bytes; // length of in email data including the padding, which will inform the sha256 block length
 
     // Next 3 signals are only needed if we are doing in-body verification
-    signal input precomputed_sha[32];
-    // This body is only the part we care about, a significant prefix of the body has been pre-hashed into precomputed_sha.
-    signal input in_body_padded[max_body_bytes];
-    signal input in_body_len_padded_bytes;
+    // signal input precomputed_sha[32];
+    // // This body is only the part we care about, a significant prefix of the body has been pre-hashed into precomputed_sha.
+    // signal input in_body_padded[max_body_bytes];
+    // signal input in_body_len_padded_bytes;
 
-    signal reveal[max_header_bytes]; // bytes to reveal
-    signal reveal_packed[max_packed_bytes]; // packed into 7-bytes. TODO: make this rotate to take up even less space
+    // signal reveal[max_header_bytes]; // bytes to reveal
+    // signal reveal_packed[max_packed_bytes]; // packed into 7-bytes. TODO: make this rotate to take up even less space
 
-    var max_twitter_len = 21;
-    var max_twitter_packed_bytes = (max_twitter_len - 1) \ 7 + 1; // ceil(max_num_bytes / 7)
+    // var max_twitter_len = 21;
+    // var max_twitter_packed_bytes = (max_twitter_len - 1) \ 7 + 1; // ceil(max_num_bytes / 7)
 
-    signal input twitter_username_idx;
-    signal reveal_twitter[max_twitter_len][max_body_bytes];
-    signal output reveal_twitter_packed[max_twitter_packed_bytes];
+    // signal input twitter_username_idx;
+    // signal reveal_twitter[max_twitter_len][max_body_bytes];
+    // signal output reveal_twitter_packed[max_twitter_packed_bytes];
 
     signal input address;
     signal input address_plus_one;
 
-    var LEN_SHA_B64 = 44;     // ceil(32/3) * 4, should be automatically calculated.
-    signal input body_hash_idx;
-    signal body_hash[LEN_SHA_B64][max_header_bytes];
+    // var LEN_SHA_B64 = 44;     // ceil(32/3) * 4, should be automatically calculated.
+    // signal input body_hash_idx;
+    // signal body_hash[LEN_SHA_B64][max_header_bytes];
 
+    // TODO: concatenate the hash the encoded payload and header, and then hash
+    // *********** hash the padded email data ***********
     component sha = Sha256Bytes(max_header_bytes);
     for (var i = 0; i < max_header_bytes; i++) {
         sha.in_padded[i] <== in_padded[i];
@@ -57,6 +63,10 @@ template EmailVerify(max_header_bytes, max_body_bytes, n, k) {
         base_msg[i\n].in[i%n] <== 0;
     }
 
+    // TODO: what is in_body_padded and in_padded?
+
+    // base message is i think just the hashed email body
+    // TODO: why are we passing in the base message into RSAVerify?
     component rsa = RSAVerify65537(n, k);
     for (var i = 0; i < msg_len; i++) {
         rsa.base_message[i] <== base_msg[i].out;
@@ -71,6 +81,7 @@ template EmailVerify(max_header_bytes, max_body_bytes, n, k) {
         rsa.signature[i] <== signature[i];
     }
 
+    // *********** header regex ***********
     component dkim_header_regex = DKIMHeaderRegex(max_header_bytes);
     for (var i = 0; i < max_header_bytes; i++) {
         dkim_header_regex.msg[i] <== in_padded[i];
@@ -124,63 +135,61 @@ template EmailVerify(max_header_bytes, max_body_bytes, n, k) {
         sha_body_bytes[i].out === sha_b64.out[i];
     }
 
-
-    /* remove twitter stuff */
     // This computes the regex states on each character
-    // component twitter_regex = TwitterResetRegex(max_body_bytes);
-    // for (var i = 0; i < max_body_bytes; i++) {
-    //     twitter_regex.msg[i] <== in_body_padded[i];
-    // }
+    component twitter_regex = TwitterResetRegex(max_body_bytes);
+    for (var i = 0; i < max_body_bytes; i++) {
+        twitter_regex.msg[i] <== in_body_padded[i];
+    }
 
-    // // This ensures we found a match at least once
-    // component found_twitter = IsZero();
-    // found_twitter.in <== twitter_regex.out;
-    // found_twitter.out === 0;
+    // This ensures we found a match at least once
+    component found_twitter = IsZero();
+    found_twitter.in <== twitter_regex.out;
+    found_twitter.out === 0;
 
-    // log(twitter_regex.out);
+    log(twitter_regex.out);
 
-    // // We isolate where the username begins: twitter_eq there is 1, everywhere else is 0
-    // component twitter_eq[max_body_bytes];
-    // for (var i = 0; i < max_body_bytes; i++) {
-    //     twitter_eq[i] = IsEqual();
-    //     twitter_eq[i].in[0] <== i;
-    //     twitter_eq[i].in[1] <== twitter_username_idx;
-    // }
+    // We isolate where the username begins: twitter_eq there is 1, everywhere else is 0
+    component twitter_eq[max_body_bytes];
+    for (var i = 0; i < max_body_bytes; i++) {
+        twitter_eq[i] = IsEqual();
+        twitter_eq[i].in[0] <== i;
+        twitter_eq[i].in[1] <== twitter_username_idx;
+    }
 
 
-    // for (var j = 0; j < max_twitter_len; j++) {
-    //     // This vector is 0 everywhere except at one value
-    //     // [x][x] is the starting character of the twitter username
-    //     reveal_twitter[j][j] <== twitter_eq[j].out * twitter_regex.reveal[j];
-    //     for (var i = j + 1; i < max_body_bytes; i++) {
-    //         // This shifts the username back to the start of the string. For example,
-    //         // [0][k0] = y, where k0 >= twitter_username_idx + 0
-    //         // [1][k1] = u, where k1 >= twitter_username_idx + 1
-    //         // [2][k2] = s, where k2 >= twitter_username_idx + 2
-    //         // [3][k3] = h, where k3 >= twitter_username_idx + 3
-    //         // [4][k4] = _, where k4 >= twitter_username_idx + 4
-    //         // [5][k5] = g, where k5 >= twitter_username_idx + 5
-    //         reveal_twitter[j][i] <== reveal_twitter[j][i - 1] + twitter_eq[i-j].out * twitter_regex.reveal[i];
-    //     }
-    // }
+    for (var j = 0; j < max_twitter_len; j++) {
+        // This vector is 0 everywhere except at one value
+        // [x][x] is the starting character of the twitter username
+        reveal_twitter[j][j] <== twitter_eq[j].out * twitter_regex.reveal[j];
+        for (var i = j + 1; i < max_body_bytes; i++) {
+            // This shifts the username back to the start of the string. For example,
+            // [0][k0] = y, where k0 >= twitter_username_idx + 0
+            // [1][k1] = u, where k1 >= twitter_username_idx + 1
+            // [2][k2] = s, where k2 >= twitter_username_idx + 2
+            // [3][k3] = h, where k3 >= twitter_username_idx + 3
+            // [4][k4] = _, where k4 >= twitter_username_idx + 4
+            // [5][k5] = g, where k5 >= twitter_username_idx + 5
+            reveal_twitter[j][i] <== reveal_twitter[j][i - 1] + twitter_eq[i-j].out * twitter_regex.reveal[i];
+        }
+    }
 
     // Pack output for solidity verifier to be < 24kb size limit
     // chunks = 7 is the number of bytes that can fit into a 255ish bit signal
-    // var chunks = 7;
-    // component packed_twitter_output[max_twitter_packed_bytes];
-    // for (var i = 0; i < max_twitter_packed_bytes; i++) {
-    //     packed_twitter_output[i] = Bytes2Packed(chunks);
-    //     for (var j = 0; j < chunks; j++) {
-    //         var reveal_idx = i * chunks + j;
-    //         if (reveal_idx < max_body_bytes) {
-    //             packed_twitter_output[i].in[j] <== reveal_twitter[i * chunks + j][max_body_bytes - 1];
-    //         } else {
-    //             packed_twitter_output[i].in[j] <== 0;
-    //         }
-    //     }
-    //     reveal_twitter_packed[i] <== packed_twitter_output[i].out;
-    //     log(reveal_twitter_packed[i]);
-    // }
+    var chunks = 7;
+    component packed_twitter_output[max_twitter_packed_bytes];
+    for (var i = 0; i < max_twitter_packed_bytes; i++) {
+        packed_twitter_output[i] = Bytes2Packed(chunks);
+        for (var j = 0; j < chunks; j++) {
+            var reveal_idx = i * chunks + j;
+            if (reveal_idx < max_body_bytes) {
+                packed_twitter_output[i].in[j] <== reveal_twitter[i * chunks + j][max_body_bytes - 1];
+            } else {
+                packed_twitter_output[i].in[j] <== 0;
+            }
+        }
+        reveal_twitter_packed[i] <== packed_twitter_output[i].out;
+        log(reveal_twitter_packed[i]);
+    }
 
     component packed_output[max_packed_bytes];
     for (var i = 0; i < max_packed_bytes; i++) {
