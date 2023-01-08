@@ -3,12 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
     "chai": "^4.3.6",
     "circomlib": "^2.0.3",
     "circomlibjs": "^0.1.2",
-    "hardhat": "^2.9.1",
+    "hardhat": "^2.12.5",
     "hardhat-circom": "^3.3.2"
   },
   "engines": {
@@ -18,5 +17,8 @@
     "circom:dev": "hardhat circom --deterministic --debug --verbose",
     "circom:prod": "hardhat circom --verbose",
     "test": "hardhat test"
+  },
+  "dependencies": {
+    "snarkjs": "git+https://github.com/vb7401/snarkjs.git#24981febe8826b6ab76ae4d76cf7f9142919d2b8"
   }
 }
