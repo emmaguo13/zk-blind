@@ -16,3 +16,7 @@ circuits/*.ptau
 
 build/
 dizkus-scripts/
+
+secret.json
+
+.env

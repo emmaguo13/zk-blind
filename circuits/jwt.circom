@@ -56,10 +56,10 @@ template JWTVerify(max_msg_bytes, n, k) {
     }
 
     // TODO: N for Base64Decode
-    component message_b64 = Base64Decode(1688);
-    for (var i = 0; i < max_msg_bytes; i++) {
-        message_b64.in[i] <== message[i];
-    }
+    // component message_b64 = Base64Decode(1688);
+    // for (var i = 0; i < max_msg_bytes; i++) {
+    //     message_b64.in[i] <== message[i];
+    // }
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.

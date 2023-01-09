@@ -171,4 +171,4 @@ template Bytes2Packed(n){
     }
 }
 
-component main { public [in, index ] } = QuinSelector(3, 2);
+// component main { public [in, index ] } = QuinSelector(3, 2);
