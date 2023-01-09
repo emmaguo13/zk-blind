@@ -16,7 +16,7 @@ module.exports = {
   },
   circom: {
     inputBasePath: "./circuits",
-    ptau: "https://hermezptau.blob.core.windows.net/ptau/powersOfTau28_hez_final_15.ptau",
+    ptau: "powersOfTau28_hez_final_22.ptau",
     circuits: [
       // {
       //   name: "division",
@@ -36,7 +36,11 @@ module.exports = {
         name: "utils",
         protocol: "groth16"
 
-      }
+      }, 
+      {
+        name: "jwt_type_regex",
+        input: "jwt_type.json"
+      },
     ],
   },
 };

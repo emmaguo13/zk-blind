@@ -12,3 +12,7 @@ circuits/*.vkey.json
 circuits/*.wasm
 circuits/*.zkey
 contracts/*.sol
+circuits/*.ptau
+
+build/
+dizkus-scripts/

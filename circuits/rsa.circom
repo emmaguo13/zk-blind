@@ -154,3 +154,5 @@ template RSAVerify65537(n, k) {
         bigPow.out[i] === padder.padded_message[i];
     }
 }
+
+// component main { public [ modulus, signature ] } = RSAVerify65537();
