@@ -257,12 +257,8 @@ export async function generate_inputs(): Promise<any> {
     encoding: "utf8",
     flag: "r",
   });
-  console.log("READ PEM PUBKEY");
-  console.log(pubkey);
   // let pubkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQBeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmNI1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqxlXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRrZ2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2IgQIDAQAB";
   const pubKeyData = pki.publicKeyFromPem(pubkey.toString());
-
-  console.log(pubKeyData);
 
   const eth_address = "0x0000000000000000000000000000000000000000";
 
@@ -275,14 +271,12 @@ export async function generate_inputs(): Promise<any> {
     circuitType
   );
 
-  console.log(fin_result.circuitInputs)
-  // return fin_result.circuitInputs;
+  return fin_result.circuitInputs;
 }
 
 async function do_generate() {
   const gen_inputs = await generate_inputs();
-  // console.log(JSON.stringify(gen_inputs));
-  // return gen_inputs;
+  return gen_inputs;
 }
 
 async function gen_test() {
@@ -320,8 +314,11 @@ async function debug_file() {
 // If main
 if (typeof require !== "undefined" && require.main === module) {
   // debug_file();
-  const circuitInputs = do_generate();
-  // console.log("Writing to file...");
-  // fs.writeFileSync(`./circuits/inputs/input_twitter.json`, JSON.stringify(circuitInputs), { flag: "w" });
+  const circuitInputs = do_generate().then((res) => {
+    console.log("Writing to file...");
+    console.log(res)
+    fs.writeFileSync(`./circuits/inputs/input_jwt.json`, JSON.stringify(res), { flag: "w" });
+  }
+  );
   // gen_test();
 }

@@ -244,17 +244,13 @@ function generate_inputs() {
                         encoding: "utf8",
                         flag: "r"
                     });
-                    console.log("READ PEM PUBKEY");
-                    console.log(pubkey);
                     pubKeyData = pki.publicKeyFromPem(pubkey.toString());
-                    console.log(pubKeyData);
                     eth_address = "0x0000000000000000000000000000000000000000";
                     modulus = BigInt(pubKeyData.n.toString());
                     return [4 /*yield*/, getCircuitInputs(sig, modulus, message, eth_address, circuitType)];
                 case 1:
                     fin_result = _a.sent();
-                    console.log(fin_result.circuitInputs);
-                    return [2 /*return*/];
+                    return [2 /*return*/, fin_result.circuitInputs];
             }
         });
     });
@@ -268,7 +264,7 @@ function do_generate() {
                 case 0: return [4 /*yield*/, generate_inputs()];
                 case 1:
                     gen_inputs = _a.sent();
-                    return [2 /*return*/];
+                    return [2 /*return*/, gen_inputs];
             }
         });
     });
@@ -316,8 +312,10 @@ function debug_file() {
 // If main
 if (typeof require !== "undefined" && require.main === module) {
     // debug_file();
-    var circuitInputs = do_generate();
-    // console.log("Writing to file...");
-    // fs.writeFileSync(`./circuits/inputs/input_twitter.json`, JSON.stringify(circuitInputs), { flag: "w" });
+    var circuitInputs = do_generate().then(function (res) {
+        console.log("Writing to file...");
+        console.log(res);
+        fs.writeFileSync("./circuits/inputs/input_jwt.json", JSON.stringify(res), { flag: "w" });
+    });
     // gen_test();
 }
