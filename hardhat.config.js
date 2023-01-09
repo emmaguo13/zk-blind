@@ -19,8 +19,8 @@ module.exports = {
     ptau: "powersOfTau28_hez_final_22.ptau",
     circuits: [
       {
-        name: "email",
-        input: "email_public.json"
+        name: "jwt_type_regex",
+        input: "jwt_type.json"
       },
     ],
   },

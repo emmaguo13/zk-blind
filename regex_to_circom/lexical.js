@@ -543,11 +543,11 @@ const email_domain = '(a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|A|B|C
 
 // let regex = `\r\ndkim-signature:(${key_chars}=${catch_all_without_semicolon}+; )+bh=${base_64}+; `;
 /* jwt regex */
-// let regex = `"typ": "JWT"`
+//let regex = `\"typ\": \"JWT\"`
 
 /* email regex: ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$ */
 // NOTE: only one domain right now
-let regex = `${email_user}+@${email_domain}+.${word_char}{2-4}`;
+let regex = `\"${email_user}+@${email_domain}+.${word_char}{2-4}\"`;
 
 // console.log(regex);
 // console.log(Buffer.from(regex).toString('base64'));
