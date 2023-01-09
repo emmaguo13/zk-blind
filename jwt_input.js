@@ -27,6 +27,15 @@ function stringToAscii(str) {
   return ascii;
 }
 
+function createTypeJson(msg) {
+  m = stringToAsciiArray(msg)
+  const data = {
+    "msg": m
+  }
+  const jsonData = JSON.stringify(data)
+  fs.writeFileSync('jwt_email.json', jsonData);
+}
+
 function createJWTJson(msg, mod, sig, addr, addr1) {
     m = stringToAsciiArray(msg)
     const data = {
@@ -53,3 +62,5 @@ createJWTJson(
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB",
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB"
 )
+
+createTypeJson("{\"https://api.openai.com/profile\": {\"email\": \"kay.r.george@gmail.com\",\"email_verified\": true,\"geoip_country\": \"US\"}")

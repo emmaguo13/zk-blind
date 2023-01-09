@@ -19,27 +19,13 @@ module.exports = {
     ptau: "powersOfTau28_hez_final_22.ptau",
     circuits: [
       // {
-      //   name: "division",
-      //   // No protocol, so it defaults to groth16
-      // },
-      // {
-      //   name: "simple-polynomial",
-      //   // Generate PLONK
-      //   protocol: "plonk",
-      // },
-      // {
-      //   name: "hash",
-      //   // Explicitly generate groth16
-      //   protocol: "groth16",
-      // },
-      {
-        name: "utils",
-        protocol: "groth16"
+      //   name: "utils",
+      //   protocol: "groth16"
 
-      }, 
+      // }, 
       // {
       //   name: "jwt_type_regex",
-      //   input: "jwt_type.json"
+      //   input: "jwt_type_regex.json"
       // },
       {
         name: "jwt",

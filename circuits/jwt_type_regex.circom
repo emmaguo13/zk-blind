@@ -117,4 +117,4 @@ template HeaderType(max_msg_bytes) {
         out <== final_state_sum[num_bytes];
 }
 
-// component main = HeaderType(95); // header is 95 right now
+// component main { public [ msg ] } = HeaderType(94); // header is 94 right now # works
