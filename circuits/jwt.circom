@@ -56,7 +56,7 @@ template JWTVerify(max_msg_bytes, n, k) {
     }
 
     // TODO: N for Base64Decode
-    component message_b64 = Base64Decode(32);
+    component message_b64 = Base64Decode(1688);
     for (var i = 0; i < max_header_bytes; i++) {
         message_b64.in[i] <== message[i];
     }
