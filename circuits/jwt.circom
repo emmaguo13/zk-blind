@@ -14,18 +14,16 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     signal input modulus[k]; // rsa pubkey, verified with smart contract + optional oracle
     signal input signature[k];
 
-    // signal input in_len_padded_bytes; // length of in email data including the padding, which will inform the sha256 block length
     signal input message_padded_bytes; // length of the message including the padding
 
     signal input address;
     signal input address_plus_one;
 
     var max_domain_len = 30;
-    var max_domain_packed_bytes = (max_domain_len - 1) \ 7 + 1; // ceil(max_num_bytes / 7)
 
-    signal input email_idx; // indexx of email domain in message
-    signal input reveal_email[max_domain_len][max_json_bytes]; // reveals email domain
-    signal output reveal_email_packed[max_domain_packed_bytes];
+    signal input domain_idx; // index of email domain in message
+    signal input domain[max_domain_len]; // input domain with padding
+    signal reveal_email[max_domain_len][max_json_bytes]; // reveals found email domain
 
     // *********** hash the padded message ***********
     component sha = Sha256Bytes(max_msg_bytes);
@@ -61,7 +59,7 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
         rsa.signature[i] <== signature[i];
     }
 
-    // TODO: N for Base64Decode
+    // decode to JSON format
     component message_b64 = Base64Decode(max_json_bytes);
     for (var i = 0; i < max_msg_bytes; i++) {
         message_b64.in[i] <== message[i];
@@ -70,55 +68,39 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     /************************** JWT REGEXES *****************************/
 
     /* ensures signature is type jwt */
-    // component type_jwt_regex = MessageType(max_json_bytes);
-    // for (var i = 0; i < max_json_bytes; i++) {
-    //     type_jwt_regex.msg[i] <== message_b64.out[i];
-    // }
-    // type_jwt_regex.out === 1;
-    // log(type_jwt_regex.out); 
+    component type_jwt_regex = MessageType(max_json_bytes);
+    for (var i = 0; i < max_json_bytes; i++) {
+        type_jwt_regex.msg[i] <== message_b64.out[i];
+    }
+    type_jwt_regex.out === 1;
 
     // /* ensures an email in json found */
-    // component email_regex = EmailDomain(max_json_bytes);
-    // for (var i = 0; i < max_json_bytes; i++) {
-    //     email_regex.msg[i] <== message_b64.out[i];
-    // }
-    // email_regex.out === 1;
+    component email_regex = EmailDomain(max_json_bytes);
+    for (var i = 0; i < max_json_bytes; i++) {
+        email_regex.msg[i] <== message_b64.out[i];
+    }
+    email_regex.out === 1;
 
-    // // isolate where email domain index is
-    // component email_eq[max_json_bytes];
-    // for (var i = 0; i < max_json_bytes; i++) {
-    //     email_eq[i] = IsEqual();
-    //     email_eq[i].in[0] <== i;
-    //     email_eq[i].in[1] <== email_idx;
-    // }
+    // isolate where email domain index is
+    component email_eq[max_json_bytes];
+    for (var i = 0; i < max_json_bytes; i++) {
+        email_eq[i] = IsEqual();
+        email_eq[i].in[0] <== i;
+        email_eq[i].in[1] <== domain_idx;
+    }
     
-    // // shifts email domain to start of string
-    // for (var j = 0; j < max_domain_len; j++) {
-    //     log(email_regex.reveal[j]);
-    //     reveal_email[j][j] <== email_eq[j].out * email_regex.reveal[j];
-    //     for (var i = j + 1; i < max_json_bytes; i++) {
-    //         reveal_email[j][i] <== reveal_email[j][i - 1] + email_eq[i-j].out * email_regex.reveal[i];
-    //     }
-    // }
+    // shifts email domain to start of string
+    for (var j = 0; j < max_domain_len; j++) {
+        reveal_email[j][j] <== email_eq[j].out * email_regex.reveal[j];
+        for (var i = j + 1; i < max_json_bytes; i++) {
+            reveal_email[j][i] <== reveal_email[j][i - 1] + email_eq[i-j].out * email_regex.reveal[i];
+        }
+    }
 
-    // // Pack output for solidity verifier to be < 24kb size limit
-    // // chunks = 7 is the number of bytes that can fit into a 255ish bit signal
-    // var chunks = 7;
-    // component packed_email_output[max_domain_packed_bytes];
-    // for (var i = 0; i < max_domain_packed_bytes; i++) {
-    //     packed_email_output[i] = Bytes2Packed(chunks);
-    //     for (var j = 0; j < chunks; j++) {
-    //         var reveal_idx = i * chunks + j;
-    //         if (reveal_idx < max_json_bytes) {
-    //             packed_email_output[i].in[j] <== reveal_email[i * chunks + j][max_json_bytes - 1];
-    //         } else {
-    //             packed_email_output[i].in[j] <== 0;
-    //         }
-    //     }
-    //     reveal_email_packed[i] <== packed_email_output[i].out;
-    //     log(reveal_email_packed[i]); // email domain
-    // }
-
+    // constrain the found email domain and passed email domain
+    for (var i = 0; i < max_domain_len; i++) {
+        domain[i] === reveal_email[i][max_json_bytes - 1];
+    }
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.
