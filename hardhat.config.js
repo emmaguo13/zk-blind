@@ -1,5 +1,7 @@
 require("hardhat-circom");
 let secret = require("./secret");
+// require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-waffle");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
