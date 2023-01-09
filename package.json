@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "chai": "^4.3.6",
+    "chai": "^4.3.7",
     "circomlib": "^2.0.3",
     "circomlibjs": "^0.1.2",
     "hardhat": "^2.12.5",
@@ -19,7 +19,10 @@
     "test": "hardhat test"
   },
   "dependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "ethereum-waffle": "^3.4.4",
+    "ethers": "^5.7.2",
     "snarkjs": "git+https://github.com/vb7401/snarkjs.git#24981febe8826b6ab76ae4d76cf7f9142919d2b8"
   }
 }

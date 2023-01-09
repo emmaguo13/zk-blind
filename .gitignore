@@ -16,5 +16,6 @@ circuits/*.ptau
 build/
 
 secret.json
+yarn.lock
 
 .env

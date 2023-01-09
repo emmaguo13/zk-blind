@@ -1,6 +1,7 @@
 require("hardhat-circom");
-require("@nomicfoundation/hardhat-toolbox");
-//let secret = require("./secret");
+let secret = require("./secret");
+// require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-waffle");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -16,14 +17,14 @@ module.exports = {
       },
     ],
   },
-  // networks: {
-  //   goerli: {
-  //     url: secret.goerli,
-  //     accounts: [secret.key],
-  //     gas: 35000000,
-  //     gasPrice: 8000000000
-  //   }
-  // },
+  networks: {
+    goerli: {
+      url: secret.goerli,
+      accounts: [secret.key],
+      gas: 35000000,
+      gasPrice: 8000000000,
+    },
+  },
   allowUnlimitedContractSize: true,
   circom: {
     inputBasePath: "./circuits",
@@ -33,15 +34,15 @@ module.exports = {
       //   name: "utils",
       //   protocol: "groth16"
 
-      // }, 
+      // },
       // {
       //   name: "jwt_type_regex",
       //   input: "jwt_type_regex.json"
       // },
       {
         name: "jwt",
-        protocol: "groth16"
-      }
+        protocol: "groth16",
+      },
     ],
   },
 };
