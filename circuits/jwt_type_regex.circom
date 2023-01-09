@@ -1,11 +1,11 @@
 include "./regex_helpers.circom";
 
 /* tests whether jwt type detected */
-template HeaderType(max_msg_bytes) {
-        signal input msg[max_msg_bytes];
+template MessageType(max_json_bytes) {
+        signal input msg[max_json_bytes];
         signal output out;
 
-        var num_bytes = max_msg_bytes;
+        var num_bytes = max_json_bytes;
         signal in[num_bytes];
         for (var i = 0; i < num_bytes; i++) {
                 in[i] <== msg[i];

@@ -19,6 +19,7 @@
     "test": "hardhat test"
   },
   "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "snarkjs": "git+https://github.com/vb7401/snarkjs.git#24981febe8826b6ab76ae4d76cf7f9142919d2b8"
   }
 }

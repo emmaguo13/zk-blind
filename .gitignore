@@ -14,7 +14,6 @@ circuits/*.zkey
 circuits/*.ptau
 
 build/
-dizkus-scripts/
 
 secret.json
 

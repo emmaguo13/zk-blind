@@ -1,10 +1,10 @@
 include "./regex_helpers.circom";
 
-template PayloadEmail(max_msg_bytes) {
-    signal input msg[max_msg_bytes];
+template EmailDomain(max_json_bytes) {
+    signal input msg[max_json_bytes];
     signal output out; // output is 1 is found, else 0
 
-    var num_bytes = max_msg_bytes;
+    var num_bytes = max_json_bytes;
 
     signal in[num_bytes];
     for (var i = 0; i < num_bytes; i++) {
