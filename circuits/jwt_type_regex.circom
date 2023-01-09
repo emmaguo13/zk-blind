@@ -1,14 +1,14 @@
 include "./regex_helpers.circom";
 
 /* tests whether jwt type detected */
-template HeaderType(header_len) {
-        signal input header[header_len];
+template HeaderType(max_msg_bytes) {
+        signal input msg[max_msg_bytes];
         signal output out;
 
-        var num_bytes = header_len;
+        var num_bytes = max_msg_bytes;
         signal in[num_bytes];
         for (var i = 0; i < num_bytes; i++) {
-                in[i] <== header[i];
+                in[i] <== msg[i];
         }
 
         component eq[12][num_bytes];
@@ -117,4 +117,4 @@ template HeaderType(header_len) {
         out <== final_state_sum[num_bytes];
 }
 
-component main = HeaderType(95); // header is 95 right now
+// component main = HeaderType(95); // header is 95 right now

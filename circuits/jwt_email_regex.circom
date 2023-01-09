@@ -1,13 +1,13 @@
 include "./regex_helpers.circom";
 
-template PayloadEmail(payload_len) {
-    signal input payload[payload_len];
+template PayloadEmail(max_msg_bytes) {
+    signal input msg[max_msg_bytes];
     signal output out; // want to output the email domain
 
-    var num_bytes = payload_len;
+    var num_bytes = max_msg_bytes;
     signal in[num_bytes];
     for (var i = 0; i < payload_len; i++) {
-        in[i] <== payload[i];
+        in[i] <== msg[i];
     }
 
     component eq[20][num_bytes];
@@ -318,4 +318,10 @@ template PayloadEmail(payload_len) {
             final_state_sum[i] <== final_state_sum[i-1] + states[i][12];
     }
     out <== final_state_sum[num_bytes];
+
+    // reveals email
+    signal output reveal[num_bytes];
+    for (var i = 0; i < num_bytes; i++) {
+        reveal[i] <== in[i] * states[i+1][12];
+    }
 }

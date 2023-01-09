@@ -60,6 +60,22 @@ template JWTVerify(max_msg_bytes, n, k) {
     for (var i = 0; i < max_header_bytes; i++) {
         message_b64.in[i] <== message[i];
     }
+
+    /* ensures signature is type jwt */
+    component type_jwt_regex = HeaderType(max_msg_bytes);
+    for (var i = 0; i < max_msg_bytes; i++) {
+        type_jwt_regex.msg[i] <== message_b64[i];
+    }
+    type_jwt_regex.out === 1;
+    log(type_jwt_regex.out); 
+
+    /* ensures 1 email in json found */
+    component email_regex = payloadEmail(max_msg_bytes);
+    for (var i = 0; i < max_msg_bytes; i++) {
+        email_regex.msg[i] <== message_b64[i];
+    }
+    email_regex.out === 1;
+    log(email_regex.reveal)
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.
