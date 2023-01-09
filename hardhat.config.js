@@ -37,10 +37,14 @@ module.exports = {
         protocol: "groth16"
 
       }, 
+      // {
+      //   name: "jwt_type_regex",
+      //   input: "jwt_type.json"
+      // },
       {
-        name: "jwt_type_regex",
-        input: "jwt_type.json"
-      },
+        name: "jwt",
+        protocol: "groth16"
+      }
     ],
   },
 };
