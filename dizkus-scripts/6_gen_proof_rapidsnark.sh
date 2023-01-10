@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CIRCUIT_NAME=email
+CIRCUIT_NAME=jwt
 BUILD_DIR="../build/$CIRCUIT_NAME"
 
 echo "****MAKE CPP FILE FOR WITNESS GENERATION****"

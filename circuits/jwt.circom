@@ -11,6 +11,7 @@ include "./jwt_type_regex.circom";
 template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     // signal input in_padded[max_header_bytes]; // prehashed email data, includes up to 512 + 64? bytes of padding pre SHA256, and padded with lots of 0s at end after the length
     signal input message[max_msg_bytes]; // TODO: header + . + payload. idk if it's k, we should pad this in javascript beforehand
+    signal input payload[max_msg_bytes]; // pass in payload separate
     signal input modulus[k]; // rsa pubkey, verified with smart contract + optional oracle
     signal input signature[k];
 
@@ -20,6 +21,8 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     signal input address_plus_one;
 
     var max_domain_len = 30;
+
+    
 
     signal input domain_idx; // index of email domain in message
     signal input domain[max_domain_len]; // input domain with padding
@@ -65,6 +68,11 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
         message_b64.in[i] <== message[i];
     }
 
+    component payload_b64 = Base64Decode(max_json_bytes);
+    for (var i = 0; i < max_msg_bytes; i++) {
+        payload_b64.in[i] <== payload[i];
+    }
+
     /************************** JWT REGEXES *****************************/
 
     /* ensures signature is type jwt */
@@ -72,12 +80,12 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     for (var i = 0; i < max_json_bytes; i++) {
         type_jwt_regex.msg[i] <== message_b64.out[i];
     }
-    type_jwt_regex.out === 1;
+    type_jwt_regex.out === 1; 
 
     // /* ensures an email in json found */
     component email_regex = EmailDomain(max_json_bytes);
     for (var i = 0; i < max_json_bytes; i++) {
-        email_regex.msg[i] <== message_b64.out[i];
+        email_regex.msg[i] <== payload_b64.out[i];
     }
     email_regex.out === 1;
 
