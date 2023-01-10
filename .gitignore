@@ -14,6 +14,7 @@ circuits/*.zkey
 circuits/*.ptau
 
 build/
+keys/
 
 secret.json
 yarn.lock
