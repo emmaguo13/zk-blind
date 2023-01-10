@@ -29,6 +29,6 @@ describe("Token contract", function () {
     const res = await bl.get("0x0000000000000000000000000000000000000000000000000000000000000000");
     console.log(res)
 
-    expect(res.includes("berkeley")).to.equal(true);
+    expect(res).to.equal("berkeley");
   });
 });
