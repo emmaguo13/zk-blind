@@ -23,7 +23,12 @@ generate witness
 ./shell_scripts/2_gen_wtns.sh
 ```
 
-phase 2 and getting zkey + vkey
+generate chunked zkey
+```
+./shell_scripts/3_gen_chunk_zkey.sh
+```
+
+phase 2 and getting full zkey + vkey
 ```
 snarkjs groth16 setup ./build/jwt/jwt.r1cs ./circuits/powersOfTau28_hez_final_22.ptau ./build/jwt/jwt_single.zkey
 
