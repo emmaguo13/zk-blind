@@ -22,8 +22,6 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
 
     var max_domain_len = 30;
 
-    
-
     signal input domain_idx; // index of email domain in message
     signal input domain[max_domain_len]; // input domain with padding
     signal reveal_email[max_domain_len][max_json_bytes]; // reveals found email domain

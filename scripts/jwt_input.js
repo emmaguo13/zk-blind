@@ -17,8 +17,18 @@ function stringToAsciiArray(str) {
   
     // Return the array of ASCII values
     return asciiValues;
+<<<<<<< HEAD:jwt_input.js
 }
 
+=======
+  }
+
+function stringToNonCharAsciiArray(str, div) {
+  const arr_len = str.length/div; 
+  return arr_len
+  
+}
+>>>>>>> 40c5be08ea0b0b34f4520f6ba8a1fe066be4e79c:scripts/jwt_input.js
 function stringToAscii(str) {
     // Initialize an empty string to store the ASCII representation
   let ascii = '';
@@ -44,13 +54,22 @@ function createTypeJson(msg) {
   fs.writeFileSync('jwt_email.json', jsonData);
 }
 
+function pad(amt_left, array) {
+  for (var i = 0; i <amt_left; i ++) {
+    array.push("0")
+  }
+
+  return array;
+}
+
 function createJWTJson(msg, mod, sig, addr, addr1) {
-    m = stringToAsciiArray(msg)
+    message = stringToAsciiArray(msg)
+    modulus = stringToAsciiArray(mod)
     const data = {
-        "message": m, 
-        "modulus": stringToAsciiArray(mod), 
+        "message": pad(2560 - message.length, message), 
+        "modulus": modulus, 
         "signature": stringToAsciiArray(sig),
-        "message_padded_bytes": m.length,
+        "message_padded_bytes": message.length,
         "address": stringToAscii(addr), 
         "address_plus_one": stringToAscii(addr1), 
     }
@@ -61,6 +80,7 @@ function createJWTJson(msg, mod, sig, addr, addr1) {
     fs.writeFileSync('jwt.json', jsonData);
 
     console.log('JSON file created successfully');
+    console.log(stringToNonCharAsciiArray(sig, 17))
 }
 
 createJWTJson(
@@ -71,4 +91,8 @@ createJWTJson(
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB"
 )
 
+<<<<<<< HEAD:jwt_input.js
 createTypeJson("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJrYXkuci5nZW9yZ2VAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdlb2lwX2NvdW50cnkiOiJVUyJ9LCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsidXNlcl9pZCI6InVzZXItWFYxVzNWbHJZdURqUVF4UWVuSVE0WW5SIn0sImlzcyI6Imh0dHBzOi8vYXV0aDAub3BlbmFpLmNvbS8iLCJzdWIiOiJhdXRoMHw2MmY3YWQ2YTNkZmQyNTQ2OTRiYjI3YzYiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSIsImh0dHBzOi8vb3BlbmFpLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2NzI5NTEwMTEsImV4cCI6MTY3MzU1NTgxMSwiYXpwIjoiVGRKSWNiZTE2V29USHROOTVueXl3aDVFNHlPbzZJdEciLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIG1vZGVsLnJlYWQgbW9kZWwucmVxdWVzdCBvcmdhbml6YXRpb24ucmVhZCBvZmZsaW5lX2FjY2VzcyJ9")
+=======
+// createTypeJson("{\"https://api.openai.com/profile\": {\"email\": \"kay.r.george@gmail.com\",\"email_verified\": true,\"geoip_country\": \"US\"}")
+>>>>>>> 40c5be08ea0b0b34f4520f6ba8a1fe066be4e79c:scripts/jwt_input.js
