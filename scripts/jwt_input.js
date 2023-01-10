@@ -3,15 +3,24 @@ const fs = require('fs'); // Import the filesystem module
 function stringToAsciiArray(str) {
     // Create an empty array to store the ASCII values
     const asciiValues = [];
+    const pad_len = 2560;
   
     // Loop through each character in the string
     for (let i = 0; i < str.length; i++) {
       // Get the ASCII value of the current character and add it to the array
       asciiValues.push(str.charCodeAt(i).toString());
     }
+
+    for(i = str.length; i < pad_len; i++) {
+      asciiValues.push("0");
+    }
   
     // Return the array of ASCII values
     return asciiValues;
+<<<<<<< HEAD:jwt_input.js
+}
+
+=======
   }
 
 function stringToNonCharAsciiArray(str, div) {
@@ -19,6 +28,7 @@ function stringToNonCharAsciiArray(str, div) {
   return arr_len
   
 }
+>>>>>>> 40c5be08ea0b0b34f4520f6ba8a1fe066be4e79c:scripts/jwt_input.js
 function stringToAscii(str) {
     // Initialize an empty string to store the ASCII representation
   let ascii = '';
@@ -32,6 +42,8 @@ function stringToAscii(str) {
   // Return the ASCII representation
   return ascii;
 }
+
+
 
 function createTypeJson(msg) {
   m = stringToAsciiArray(msg)
@@ -79,4 +91,8 @@ createJWTJson(
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB"
 )
 
+<<<<<<< HEAD:jwt_input.js
+createTypeJson("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJrYXkuci5nZW9yZ2VAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdlb2lwX2NvdW50cnkiOiJVUyJ9LCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsidXNlcl9pZCI6InVzZXItWFYxVzNWbHJZdURqUVF4UWVuSVE0WW5SIn0sImlzcyI6Imh0dHBzOi8vYXV0aDAub3BlbmFpLmNvbS8iLCJzdWIiOiJhdXRoMHw2MmY3YWQ2YTNkZmQyNTQ2OTRiYjI3YzYiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSIsImh0dHBzOi8vb3BlbmFpLmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE2NzI5NTEwMTEsImV4cCI6MTY3MzU1NTgxMSwiYXpwIjoiVGRKSWNiZTE2V29USHROOTVueXl3aDVFNHlPbzZJdEciLCJzY29wZSI6Im9wZW5pZCBwcm9maWxlIGVtYWlsIG1vZGVsLnJlYWQgbW9kZWwucmVxdWVzdCBvcmdhbml6YXRpb24ucmVhZCBvZmZsaW5lX2FjY2VzcyJ9")
+=======
 // createTypeJson("{\"https://api.openai.com/profile\": {\"email\": \"kay.r.george@gmail.com\",\"email_verified\": true,\"geoip_country\": \"US\"}")
+>>>>>>> 40c5be08ea0b0b34f4520f6ba8a1fe066be4e79c:scripts/jwt_input.js

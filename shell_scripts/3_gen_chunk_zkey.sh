@@ -1,7 +1,11 @@
 #!/bin/bash
 
 CIRCUIT_NAME=jwt
+<<<<<<< HEAD
+BUILD_DIR="../build/$CIRCUIT_NAME"
+=======
 BUILD_DIR="./build/$CIRCUIT_NAME"
+>>>>>>> 40c5be08ea0b0b34f4520f6ba8a1fe066be4e79c
 R1CS_FILE="$BUILD_DIR/$CIRCUIT_NAME.r1cs"
 PARTIAL_ZKEYS="$BUILD_DIR"/partial_zkeys
 PHASE1=./circuits/powersOfTau28_hez_final_22.ptau

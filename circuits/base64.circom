@@ -48,6 +48,11 @@ template Base64Lookup() {
     equal_plus.in <== in - 43;
     signal sum_plus <== sum_09 + equal_plus.out * (in + 19);
 
+    // // '.'
+    // component equal_period = IsZero();
+    // equal_period.in <== in - 46;
+    // signal sum_period <== sum_plus + equal_period.out * (in - 30);
+
     // '/'
     component equal_slash = IsZero();
     equal_slash.in <== in - 47;
