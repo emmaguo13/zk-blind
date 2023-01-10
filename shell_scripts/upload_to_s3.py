@@ -7,21 +7,21 @@ import time
 s3 = boto3.client('s3') # Ask Aayush for the access key and secret access key
 
 # Set the name of the remote directory and the AWS bucket
-zkey_dir = '../build/email/'
-wasm_dir = '../build/email/email_js/'
-bucket_name = 'zkemail-zkey-chunks' # us-east-1
+zkey_dir = '../build/jwt/'
+wasm_dir = '../build/jwt/jwt_js/'
+bucket_name = 'zkjwt-zkey-chunks' # 
 
 def upload_to_s3(filename, dir=""):
     with open(dir + filename, 'rb') as file:
         print("Starting upload...")
-        s3.upload_fileobj(file, bucket_name, filename, ExtraArgs={'ACL': 'public-read', 'ContentType': 'binary/octet-stream'})
+        s3.upload_fileobj(file, bucket_name, filename, ExtraArgs={'ContentType': 'binary/octet-stream'})
         print("Done uploading!")
 
 # Loop through the files in the remote directory
 for dir in [zkey_dir, wasm_dir]:
     for file in os.listdir(dir):
         # Check if the file matches the pattern
-        if file.startswith('email.zkey'):
+        if file.startswith('jwt.zkey'):
             # upload_to_s3(file, dir) # Uncompressed file
 
             # Create a zip file for the file
@@ -35,6 +35,6 @@ for dir in [zkey_dir, wasm_dir]:
 
             os.remove(tar_file_name)
 
-        if file.startswith('vkey.json') or file.startswith('email.wasm'):
+        if file.startswith('vkey.json') or file.startswith('jwt.wasm'):
             # Upload the zip file to the AWS bucket, overwriting any existing file with the same name
             upload_to_s3(file, dir)
