@@ -4,10 +4,8 @@ pragma solidity ^0.6.11;
 import {Verifier} from "./Verifier.sol";
 
 contract Blind {
-    mapping(uint => uint) public companies;
+    mapping(bytes32 => string) public companies;
     Verifier public verifier;
-
-    event Company(uint company);
 
     constructor(address _verifier) public {
         verifier = Verifier(_verifier);
@@ -18,7 +16,7 @@ contract Blind {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[18] memory input // Just the Hex representation of our public circuit inputs
+        uint[48] memory input // Just the Hex representation of our public circuit inputs
         ) public {
 
         // 0 to 16 modulus 
@@ -53,16 +51,21 @@ contract Blind {
             require(uint256(input[i]) == openaiPubkey[i], "Ivalid input key to snark");
         }
 
-        // Public Key
-        uint pubkey = input[17];
+        // User's eth pubkey
+        bytes32 pubkey = bytes32(input[17]);
+
+        bytes memory domain = new bytes(0);
 
         // Domain
-        // uint domain = input[18];
+        for (uint256 i = 18; i < 47; i++) {
+            //domain.push(byte(input[i]));
+            domain = abi.encodePacked(domain, byte(uint8(input[i])));
+        }
 
-        // companies[pubkey] = domain;
+        companies[pubkey] = string(domain);
     }
 
-    function get(uint pubkey) public {
-        emit Company(companies[pubkey]);
+    function get(bytes32 pubkey) public view returns (string memory){
+        return companies[pubkey];
     }
 }
