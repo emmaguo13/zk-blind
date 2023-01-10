@@ -23,7 +23,7 @@ generate witness
 ./shell_scripts/2_gen_wtns.sh
 ```
 
-generate chunked zkey
+generate chunked zkeys
 ```
 ./shell_scripts/3_gen_chunk_zkey.sh
 ```
