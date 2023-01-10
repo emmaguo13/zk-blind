@@ -9,7 +9,6 @@ contract Blind {
 
     constructor(address _verifier) public {
         verifier = Verifier(_verifier);
-
     }
 
     function add(
@@ -21,7 +20,7 @@ contract Blind {
 
         // 0 to 16 modulus 
         // 17 pubkey 
-        // 18 domain 
+        // 18 to 47 domain 
 
         // Verify Proof
         require(verifier.verifyProof(a, b, c, input) == true, "Proof failed to verify");

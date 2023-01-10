@@ -6,16 +6,16 @@ async function main() {
   const v = await verifier.deploy();
   await v.deployed();
 
-  console.log(v.address)
+  console.log("Verifier.sol deployed to:", v.address)
 
-  const contract = await hre.ethers.getContractFactory("Blind");
+  const blind = await hre.ethers.getContractFactory("Blind");
 
-  const c = await contract.deploy(
+  const b = await blind.deploy(
     v.address
   );
-  await c.deployed();
+  await b.deployed();
 
-  console.log(c.address)
+  console.log("Blind.sol deployed to:", b.address)
 }
 
 main();
