@@ -1,30 +1,38 @@
-# circom-starter
+# zk-blind
 
-A basic circom project using [Hardhat](https://github.com/nomiclabs/hardhat) and [hardhat-circom](https://github.com/projectsophon/hardhat-circom). This combines the multiple steps of the [Circom](https://github.com/iden3/circom) and [SnarkJS](https://github.com/iden3/snarkjs) workflow into your [Hardhat](https://hardhat.org) workflow.
+post anonymous confessions about your work place in zero-knowledge!
 
-By providing configuration containing your Phase 1 Powers of Tau and circuits, this plugin will:
+`yarn` to install all dependencies.
 
-1. Compile the circuits
-2. Apply the final beacon
-3. Output your `wasm` and `zkey` files
-4. Generate and output a `Verifier.sol`
+## generate inputs
 
-## Documentation
+```node scripts/generate_input.js``` to generate inputs into `jwt.json`
 
-See the source projects for full documentation and configuration
+## circuits 
 
-## Install
+compile circuits in root project directory.
+```./shell_scripts/1_compile.sh```
 
-`yarn` to install dependencies
+generate witness
+```./shell_scripts/2_gen_wtns.sh```
 
-## Development builds
+phase 2 and getting zkey + vkey
+```
+snarkjs groth16 setup ./build/jwt/jwt.r1cs ./circuits/powersOfTau28_hez_final_22.ptau ./build/jwt/jwt_single.zkey
 
-`yarn circom:dev` to build deterministic development circuits.
+snarkjs zkey contribute ./build/jwt/jwt_single.zkey ./build/jwt/jwt_single1.zkey --name="1st Contributor Name" -v
 
-Further, for debugging purposes, you may wish to inspect the intermediate files. This is possible with the `--debug` flag which the `circom:dev` task enables by default. You'll find them (by default) in `artifacts/circom/`
+snarkjs zkey export verificationkey ./build/jwt/jwt_single1.zkey ./build/jwt/verification_key.json
 
-To build a single circuit during development, you can use the `--circuit` CLI parameter. For example, if you make a change to `hash.circom` and you want to _only_ rebuild that, you can run `yarn circom:dev --circuit hash`.
+```
 
-## Production builds
+generate proof
+```
+snarkjs groth16 prove ./build/jwt/jwt_single1.zkey ./build/jwt/witness.wtns ./build/jwt/proof.json ./build/jwt/public.json
+```
 
-`yarn circom:prod` for production builds (using `Date.now()` as entropy)
+verify proof
+```snarkjs groth16 verify ./build/jwt/verification_key.json ./build/jwt/public.json ./build/jwt/proof.json```
+
+
+
