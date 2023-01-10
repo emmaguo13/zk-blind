@@ -147,7 +147,7 @@ async function partialSha(
 export async function getCircuitInputs(
   rsa_signature: BigInt,
   rsa_modulus: BigInt,
-  message: Buffer,
+  msg: Buffer,
   eth_address: string,
   circuit: CircuitType
 ): Promise<{
@@ -162,7 +162,7 @@ export async function getCircuitInputs(
   // const modulusBigInt = bytesToBigInt(pubKeyParts[2]);
   const modulusBigInt = rsa_modulus;
   // Message is the email header with the body hash
-  const prehash_message_string = message;
+  const prehash_message_string = msg;
   // const baseMessageBigInt = AAYUSH_PREHASH_MESSAGE_INT; // bytesToBigInt(stringToBytes(message)) ||
   // const postShaBigint = AAYUSH_POSTHASH_MESSAGE_PADDED_INT;
   const signatureBigInt = rsa_signature;
@@ -198,8 +198,8 @@ export async function getCircuitInputs(
   const modulus = toCircomBigIntBytes(modulusBigInt);
   const signature = toCircomBigIntBytes(signatureBigInt);
 
-  const m_padded_bytes = messagePaddedLen.toString();
-  const m = await Uint8ArrayToCharArray(messagePadded); // Packed into 1 byte signals
+  const message_padded_bytes = messagePaddedLen.toString();
+  const message = await Uint8ArrayToCharArray(messagePadded); // Packed into 1 byte signals
   const base_message = toCircomBigIntBytes(postShaBigintUnpadded);
 
   const address = bytesToBigInt(fromHex(eth_address)).toString();
@@ -216,10 +216,10 @@ export async function getCircuitInputs(
     };
   } else if (circuit === CircuitType.JWT) {
     circuitInputs = {
-      m,
+      message,
       modulus,
       signature,
-      m_padded_bytes,
+      message_padded_bytes,
       address,
       address_plus_one,
     };
@@ -247,15 +247,38 @@ export async function generate_inputs(): Promise<any> {
   const signature =
     "mLCysHQtDftfFey4F-ntFma22r5-qpxtkXsiDw6TY30Tnoj2kPQ_YdSjzagrwRgF7pHE8SSM_roo2wDh3c_8vDNRZeax4VICZjYmPS-3ZWAV0XyjjlgWgFleTqVT72M-VlPCdecHiYQJojlYHJyGybvTCaX1cqoF9aAMy8wBvRbSceECmX15k4nKG51Z5Le7k_vOShaxYmwrRhMIip4KRv-DW1FXAdi_F-MYSrqZ6Oq-nglMujxD2NOoHoqOqmyd1OMIrc6oIRuRqBXlRnQ0IdUDQbiXfyFVC0ItIME3a4SLoWp_rrmY1tSrGJu93MZrjhzfkNglJ-FOp4kKZAKkzA";
 
+  var decode = function(input) {
+      // Replace non-url compatible chars with base64 standard chars
+      input = input
+          .replace(/-/g, '+')
+          .replace(/_/g, '/');
+
+      // Pad out with standard base64 required padding characters
+      var pad = input.length % 4;
+      if(pad) {
+        if(pad === 1) {
+          throw new Error('InvalidLengthError: Input base64url string is the wrong length to determine padding');
+        }
+        input += new Array(5-pad).join('=');
+      }
+
+      return input;
+  }
+
+  // const signature = Buffer.from(encodedSignature, 'base64');
+
   let sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"));
+
+  console.log("decoded sig")
+  console.log(sig)
 
   let msg =
     "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJzZWh5dW5AYmVya2VsZXkuZWR1IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdlb2lwX2NvdW50cnkiOiJVUyJ9LCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsidXNlcl9pZCI6InVzZXIta1dMaXBzT3dMZFd4MXdMc0I3clR3UnFlIn0sImlzcyI6Imh0dHBzOi8vYXV0aDAub3BlbmFpLmNvbS8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNjYwOTg2MjEwMzkxMTMwNjgwNyIsImF1ZCI6WyJodHRwczovL2FwaS5vcGVuYWkuY29tL3YxIiwiaHR0cHM6Ly9vcGVuYWkuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3MzE1NTQ0NiwiZXhwIjoxNjczNzYwMjQ2LCJhenAiOiJUZEpJY2JlMTZXb1RIdE45NW55eXdoNUU0eU9vNkl0RyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgbW9kZWwucmVhZCBtb2RlbC5yZXF1ZXN0IG9yZ2FuaXphdGlvbi5yZWFkIG9mZmxpbmVfYWNjZXNzIn0";
-  let message = Buffer.from(msg, 'base64');
+  let message = Buffer.from(msg);
   let circuitType = CircuitType.JWT;
   let pubkey = fs.readFileSync("./public_key.pem", {
-    encoding: "utf8",
-    flag: "r",
+    // encoding: "utf8",
+    // flag: "r",
   });
   // let pubkey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQBeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K7eJC/oOnrxCRzFYBqQbYo+JMeqNkrCn34yed4XkX4ttoHi7MwCEpVfb05Qf/ZAmNI1XjecFYTyZQFrd9LjkX6lr05zY6aM/+MCBNeBWp35pLLKhiq9AieB1wbDPcGnqxlXuU/bLgIyqUltqLkr9JHsf/2T4VrXXNyNeQyBq5wjYlRkpBQDDDNOcdGpx1buRrZ2hFyYuXDRrMcR6BQGC0ur9hI5obRYlchDFhlb0ElsJ2bshDDGRk5k3doHqbhj2IgQIDAQAB";
   const pubKeyData = pki.publicKeyFromPem(pubkey.toString());
@@ -317,7 +340,7 @@ if (typeof require !== "undefined" && require.main === module) {
   const circuitInputs = do_generate().then((res) => {
     console.log("Writing to file...");
     console.log(res)
-    fs.writeFileSync(`./circuits/inputs/input_jwt.json`, JSON.stringify(res), { flag: "w" });
+    fs.writeFileSync(`./jwt.json`, JSON.stringify(res), { flag: "w" });
   }
   );
   // gen_test();
