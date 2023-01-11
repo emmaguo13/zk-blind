@@ -45,10 +45,24 @@ generate proof
 snarkjs groth16 prove ./build/jwt/jwt_single1.zkey ./build/jwt/witness.wtns ./build/jwt/proof.json ./build/jwt/public.json
 ```
 
-verify proof
+verify proof offchain
 ```
 snarkjs groth16 verify ./build/jwt/verification_key.json ./build/jwt/public.json ./build/jwt/proof.json
 ```
 
+generate verifier.sol
+```
+snarkjs zkey export solidityverifier ./build/jwt/jwt_single1.zkey Verifier.sol
+```
+
+run local hardhat test 
+```
+npx hardhat test ./test/blind.test.js
+```
+
+deploy blind and verifier contracts
+```
+npx hardhat --network goerli hardhat run ./scripts/deploy.js
+```
 
 
