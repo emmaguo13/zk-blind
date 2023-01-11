@@ -1,6 +1,6 @@
 # zk-blind
 
-post anonymous confessions about your work place in zero-knowledge!
+post anonymous confessions about your work place / organization in zero-knowledge!
 
 `yarn` to install all dependencies.
 
@@ -12,6 +12,8 @@ node scripts/generate_input.js
 ``` 
 
 ## circuits 
+
+These circuits check for (1) valid rsa signature, (2) that the message is a JWT, and (3) ownership of a specific email domain.
 
 compile circuits in root project directory.
 ```
