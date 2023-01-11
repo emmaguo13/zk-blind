@@ -11,7 +11,6 @@ include "./jwt_type_regex.circom";
 template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     // signal input in_padded[max_header_bytes]; // prehashed email data, includes up to 512 + 64? bytes of padding pre SHA256, and padded with lots of 0s at end after the length
     signal input message[max_msg_bytes]; // TODO: header + . + payload. idk if it's k, we should pad this in javascript beforehand
-    signal input payload[max_msg_bytes]; // pass in payload separate
     signal input modulus[k]; // rsa pubkey, verified with smart contract + optional oracle
     signal input signature[k];
 
@@ -20,6 +19,7 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     signal input address;
     signal input address_plus_one;
 
+    signal input period_idx; // index of the period in the base64 encoded msg
     var max_domain_len = 30;
 
     signal input domain_idx; // index of email domain in message
@@ -62,14 +62,21 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
 
     // decode to JSON format
     component message_b64 = Base64Decode(max_json_bytes);
-    for (var i = 0; i < max_msg_bytes; i++) {
-        message_b64.in[i] <== message[i];
-    }
+    component eqs[max_msg_bytes];
+    signal int[max_msg_bytes];
 
-    component payload_b64 = Base64Decode(max_json_bytes);
-    for (var i = 0; i < max_msg_bytes; i++) {
-        payload_b64.in[i] <== payload[i];
+    for (var i = 0; i < max_msg_bytes - 1; i++) {
+        eqs[i] = GreaterEqThan(15);
+        eqs[i].in[0] <== i;
+        eqs[i].in[1] <== period_idx; 
+
+        var i_plus_one = eqs[i].out;
+        var i_normal = 1 - eqs[i].out;
+
+        int[i] <== (message[i] * i_normal);
+        message_b64.in[i] <== (message[i + 1] * (i_plus_one)) + int[i];
     }
+    message_b64.in[max_msg_bytes - 1] <== 0;
 
     /************************** JWT REGEXES *****************************/
 
@@ -83,7 +90,7 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     // /* ensures an email in json found */
     component email_regex = EmailDomain(max_json_bytes);
     for (var i = 0; i < max_json_bytes; i++) {
-        email_regex.msg[i] <== payload_b64.out[i];
+        email_regex.msg[i] <== message_b64.out[i];
     }
     email_regex.out === 1;
 
