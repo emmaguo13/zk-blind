@@ -20,3 +20,6 @@ secret.json
 yarn.lock
 
 .env
+
+.DS_Store
+.DS_Store?
