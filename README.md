@@ -62,7 +62,7 @@ npx hardhat test ./test/blind.test.js
 
 deploy blind and verifier contracts
 ```
-npx hardhat run ./scripts/deploy.js
+npx hardhat run ./scripts/deploy.js --network goerli
 ```
 
 
