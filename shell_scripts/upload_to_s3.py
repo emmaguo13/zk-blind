@@ -22,7 +22,7 @@ for dir in [zkey_dir, wasm_dir]:
     for file in os.listdir(dir):
         # Check if the file matches the pattern
         if file.startswith('jwt.zkey'):
-            # upload_to_s3(file, dir) # Uncompressed file
+            upload_to_s3(file, dir) # Uncompressed file
 
             # Create a zip file for the file
             tar_file_name = file + '.tar.gz'

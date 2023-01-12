@@ -1,9 +1,10 @@
 const fs = require('fs'); // Import the filesystem module
+const { MAX_HEADER_PADDED_BYTES } = require('../helpers/constants');
 
 function stringToAsciiArray(str) {
     // Create an empty array to store the ASCII values
     const asciiValues = [];
-    const pad_len = 2560;
+    const pad_len = 1024;
   
     // Loop through each character in the string
     for (let i = 0; i < str.length; i++) {
@@ -98,14 +99,14 @@ function createJWTJson(msg, mod, sig, addr, addr1) {
     domain = stringToAsciiArray()
 
     const data = {
-        "message": pad(2560 - message.length, message),
-        "payload": pad(2560 - payload.length, payload), 
+        "message": pad(MAX_HEADER_PADDED_BYTES - message.length, message),
+        "payload": pad(MAX_HEADER_PADDED_BYTES - payload.length, payload), 
         "modulus": modulus, 
         "signature": stringToAsciiArray(sig),
         "message_padded_bytes": message.length,
         "address": stringToAscii(addr), 
         "address_plus_one": stringToAscii(addr1), 
-        "domain_idx": ,
+        "domain_idx": 140,
         "domain": pad(30 - domain.length, domain)
     }
     // Convert the data to a JSON string
