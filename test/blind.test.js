@@ -20,22 +20,22 @@ describe("Token contract", function () {
     console.log("Blind.sol deployed to:", bl.address);
 
     const a = [
-      "0x0a08163c892e678e5aa9a8aaa6711588a27048bd854694b27cc437b2e4671908",
-      "0x241c35d4ecd96a287026fc26dff3d4aacbe4e6774b43a1cb4447a6b7542362cd",
+      "0x20e318a6fccf1eefc866345243313ed354baf825391ddf59c478db08db0d95a7",
+      "0x203efc711e5fb099c71af02ca61067ea702a2c4ca8dd9971b6c42e918dc172a2",
     ];
     const b = [
       [
-        "0x16494aec6bc66ef3c5367caa40e87ddc6295ebd17ef74d1d4909d746cb6d4781",
-        "0x2e7be4557581ca692d289e3773946ccf99694d8f35f9ac2bb1ce4518e48bba6f",
+        "0x1b0bd9a47afdeb9ce10a5dd710ffec891029b271b73e549d538705f7bea3b8dd",
+        "0x144e33e5208f22b924e79dad1530910f4943c471d6a0ecb47c9087005e822d13",
       ],
       [
-        "0x046ea21dbd94f313e4283a90cc5d8bd86e62070756b4165ebf5f0ffc59d45f53",
-        "0x166a35b44e322094265129f1351a3b22a492eed10654d6b568a507483ffe6e75",
+        "0x0b30cbf936ceffc4a0662995a46864329fe3eb8ef19db510296a5fca7e921dcf",
+        "0x004f5f432a0bc290301a9659234806b777756605da0e6c1b810abece4b0c2cd2",
       ],
     ];
     const c = [
-      "0x0e7cfa258e280d620949b5cbd8f905d9bc781e4816ac3021ab8f94952d9af702",
-      "0x2ec3a0ba5286757371f92aeb6b347763b5e19b544a9616198a57fb7e758e5456",
+      "0x1c8b29a792b3f494b4ba032def4041f3d47bf94a611d7c571cfc996b0c0bd710",
+      "0x1a5317f6f9b1c01f4b7ceb134bb38bfb00761d25c669da62b99bd0f34d8f5070",
     ];
     const input = [
       "0x0000000000000000000000000000000000c8430c6464e64ddda07a9b863d8881",
@@ -91,9 +91,7 @@ describe("Token contract", function () {
     const add = await bl.add(a, b, c, input);
     console.log(add);
 
-    const res = await bl.get(
-      "0x0000000000000000000000000000000000000000"
-    );
+    const res = await bl.get("0x0000000000000000000000000000000000000000");
     console.log(res);
 
     expect(res).to.equal("berkeley");
