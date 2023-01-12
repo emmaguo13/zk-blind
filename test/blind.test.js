@@ -92,7 +92,7 @@ describe("Token contract", function () {
     console.log(add);
 
     const res = await bl.get(
-      "0x0000000000000000000000000000000000000000000000000000000000000000"
+      "0x0000000000000000000000000000000000000000"
     );
     console.log(res);
 

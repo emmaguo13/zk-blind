@@ -4,7 +4,7 @@ pragma solidity ^0.6.11;
 import {Verifier} from "./Verifier.sol";
 
 contract Blind {
-    mapping(bytes32 => string) public companies;
+    mapping(address => string) public companies;
     Verifier public verifier;
 
     constructor(address _verifier) public {
@@ -51,7 +51,7 @@ contract Blind {
         }
 
         // User's eth pubkey
-        bytes32 pubkey = bytes32(input[17]);
+        address addr = address(uint160(uint256(bytes32(input[17]))));
 
         bytes memory domain = new bytes(0);
 
@@ -63,10 +63,10 @@ contract Blind {
             }
         }
 
-        companies[pubkey] = string(domain);
+        companies[addr] = string(domain);
     }
 
-    function get(bytes32 pubkey) public view returns (string memory){
-        return companies[pubkey];
+    function get(address addr) public view returns (string memory){
+        return companies[addr];
     }
 }
