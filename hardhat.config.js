@@ -21,8 +21,8 @@ module.exports = {
     goerli: {
       url: secret.goerli,
       accounts: [secret.key],
-      gas: 35000000,
-      gasPrice: 8000000000,
+      gas: 350000000000,
+      gasPrice: 80000000000,
     },
   },
   allowUnlimitedContractSize: true,
