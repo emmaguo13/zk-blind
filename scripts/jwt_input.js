@@ -4,7 +4,7 @@ const { MAX_HEADER_PADDED_BYTES } = require('../helpers/constants');
 function stringToAsciiArray(str) {
     // Create an empty array to store the ASCII values
     const asciiValues = [];
-    const pad_len = 1024;
+    const pad_len = 960;
   
     // Loop through each character in the string
     for (let i = 0; i < str.length; i++) {
