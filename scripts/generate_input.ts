@@ -194,12 +194,12 @@ export async function getCircuitInputs(
   );
 
   // Compute identity revealer
-  let circuitInputs;
-  const modulus = toCircomBigIntBytes(modulusBigInt);
-  const signature = toCircomBigIntBytes(signatureBigInt);
+  let circuitInputs : ICircuitInputs;
+  const modulus : string[] = toCircomBigIntBytes(modulusBigInt);
+  const signature : string[] = toCircomBigIntBytes(signatureBigInt);
 
-  const message_padded_bytes = messagePaddedLen.toString();
-  const message = await Uint8ArrayToCharArray(messagePadded); // Packed into 1 byte signals
+  const message_padded_bytes : string = messagePaddedLen.toString();
+  const message : string[] = await Uint8ArrayToCharArray(messagePadded); // Packed into 1 byte signals
   const base_message = toCircomBigIntBytes(postShaBigintUnpadded);
 
   const address = bytesToBigInt(fromHex(eth_address)).toString();
@@ -213,7 +213,7 @@ export async function getCircuitInputs(
       modulus,
       signature,
       base_message,
-    };
+    } as ICircuitInputs;
   } else if (circuit === CircuitType.JWT) {
     circuitInputs = {
       message,
@@ -222,13 +222,13 @@ export async function getCircuitInputs(
       message_padded_bytes,
       address,
       address_plus_one,
-    };
+    } as ICircuitInputs;
   } else {
     assert(circuit === CircuitType.SHA, "Invalid circuit type");
     circuitInputs = {
-      m,
-      m_padded_bytes,
-    };
+      message,
+      message_padded_bytes,
+    } as ICircuitInputs;
   }
   return {
     circuitInputs,
@@ -247,7 +247,7 @@ export async function generate_inputs(): Promise<any> {
   const signature =
     "mLCysHQtDftfFey4F-ntFma22r5-qpxtkXsiDw6TY30Tnoj2kPQ_YdSjzagrwRgF7pHE8SSM_roo2wDh3c_8vDNRZeax4VICZjYmPS-3ZWAV0XyjjlgWgFleTqVT72M-VlPCdecHiYQJojlYHJyGybvTCaX1cqoF9aAMy8wBvRbSceECmX15k4nKG51Z5Le7k_vOShaxYmwrRhMIip4KRv-DW1FXAdi_F-MYSrqZ6Oq-nglMujxD2NOoHoqOqmyd1OMIrc6oIRuRqBXlRnQ0IdUDQbiXfyFVC0ItIME3a4SLoWp_rrmY1tSrGJu93MZrjhzfkNglJ-FOp4kKZAKkzA";
 
-  var decode = function(input) {
+  var decode = function(input:any) {
       // Replace non-url compatible chars with base64 standard chars
       input = input
           .replace(/-/g, '+')
@@ -276,7 +276,7 @@ export async function generate_inputs(): Promise<any> {
     "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJzZWh5dW5AYmVya2VsZXkuZWR1IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdlb2lwX2NvdW50cnkiOiJVUyJ9LCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsidXNlcl9pZCI6InVzZXIta1dMaXBzT3dMZFd4MXdMc0I3clR3UnFlIn0sImlzcyI6Imh0dHBzOi8vYXV0aDAub3BlbmFpLmNvbS8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNjYwOTg2MjEwMzkxMTMwNjgwNyIsImF1ZCI6WyJodHRwczovL2FwaS5vcGVuYWkuY29tL3YxIiwiaHR0cHM6Ly9vcGVuYWkuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3MzE1NTQ0NiwiZXhwIjoxNjczNzYwMjQ2LCJhenAiOiJUZEpJY2JlMTZXb1RIdE45NW55eXdoNUU0eU9vNkl0RyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgbW9kZWwucmVhZCBtb2RlbC5yZXF1ZXN0IG9yZ2FuaXphdGlvbi5yZWFkIG9mZmxpbmVfYWNjZXNzIn0";
   let message = Buffer.from(msg);
   let circuitType = CircuitType.JWT;
-  let pubkey = fs.readFileSync("./public_key.pem", {
+  let pubkey = fs.readFileSync("../public_key.pem", {
     // encoding: "utf8",
     // flag: "r",
   });
@@ -340,7 +340,7 @@ if (typeof require !== "undefined" && require.main === module) {
   const circuitInputs = do_generate().then((res) => {
     console.log("Writing to file...");
     console.log(res)
-    fs.writeFileSync(`./jwt.json`, JSON.stringify(res), { flag: "w" });
+    fs.writeFileSync(`./confusion.json`, JSON.stringify(res), { flag: "w" });
   }
   );
   // gen_test();

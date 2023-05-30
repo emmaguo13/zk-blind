@@ -6,6 +6,8 @@ include "./rsa.circom";
 include "./base64.circom";
 include "./jwt_email_regex.circom";
 include "./jwt_type_regex.circom";
+include "./ascii.circom";
+include "./timestamp.circom";
 
 // k - bignum
 template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
@@ -21,10 +23,16 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
 
     signal input period_idx; // index of the period in the base64 encoded msg
     var max_domain_len = 30;
+    var max_timestamp_len = 10;
+
+    signal reveal_timestamp[max_timestamp_len][max_json_bytes];
 
     signal input domain_idx; // index of email domain in message
     signal input domain[max_domain_len]; // input domain with padding
     signal reveal_email[max_domain_len][max_json_bytes]; // reveals found email domain
+
+    signal input time_idx; // index of expiration timestamp
+    signal input time;
 
     // *********** hash the padded message ***********
     component sha = Sha256Bytes(max_msg_bytes);
@@ -114,9 +122,46 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     for (var i = 0; i < max_domain_len; i++) {
         domain[i] === reveal_email[i][max_json_bytes - 1];
     }
+
+    // check expiration date is found 
+    component time_regex = Timestamp(max_json_bytes);
+    for (var i = 0; i < max_json_bytes; i++) {
+        time_regex.msg[i] <== message_b64.out[i];
+    }
+    time_regex.out === 1;
+
+    // isolate where expiration index is
+    component exp_eq[max_json_bytes];
+    for (var i = 0; i < max_json_bytes; i++) {
+        exp_eq[i] = IsEqual();
+        exp_eq[i].in[0] <== i;
+        exp_eq[i].in[1] <== time_idx;
+    }
+    
+    // shifts timestamp to start of string
+    for (var j = 0; j < max_timestamp_len; j++) {
+        reveal_timestamp[j][j] <== exp_eq[j].out * time_regex.reveal[j];
+        for (var i = j + 1; i < max_json_bytes; i++) {
+            reveal_timestamp[j][i] <== reveal_timestamp[j][i - 1] + exp_eq[i-j].out * time_regex.reveal[i];
+        }
+    }
+
+    // convert to number
+    component time_num = AsciiToNum(max_timestamp_len);
+    for (var j = 0; j < max_timestamp_len; j++) {
+        time_num.in[j] <== reveal_timestamp[j][max_json_bytes -1];
+    }
+
+    signal exp_time <== time_num.out + 86400;
+    // check that the current time is less than a day after the expiration date
+    component less_exp_time = LessThan(34);
+    less_exp_time.in[0] <== time;
+    less_exp_time.in[1] <== exp_time;
+
+    less_exp_time.out === 1;
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.
 // This makes modulus and reveal_email_packed public. hash(signature) can optionally be made public, but is not recommended since it allows the mailserver to trace who the offender is.
 
-component main { public [ modulus, address, domain ] } = JWTVerify(960, 718, 121, 17);
+component main { public [ modulus, address, domain ] } = JWTVerify(1024, 766, 121, 17);

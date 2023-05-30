@@ -88,15 +88,37 @@ function findEmailInJSON(json) {
   return { domain, domain_index }
 }
 
+function findTimestampInJSON(json) {
+  let time_index = json.indexOf(`"exp":`) + 6
+  let timestamp = json.substring(time_index, time_index + 10)
+
+  return {timestamp, time_index}
+  
+}
+
 function findPayload(token) {
   const period_idx = token.indexOf(".")
   return token.substring(period_idx + 1);
 }
 
+function AsciiArrayToString(arr) {
+  let str = ''
+  for (let i = 0; i < arr.length; i++) {
+    str += String.fromCharCode(arr[i])
+  }
+  return str
+}
+
 function createJWTJson(msg, mod, sig, addr, addr1) {
     message = stringToAsciiArray(msg)
     modulus = stringToAsciiArray(mod)
-    domain = stringToAsciiArray()
+    domain = stringToAsciiArray("berkeley")
+
+    var s = Buffer.from(msg, 'base64')
+    var json = AsciiArrayToString(s)
+    console.log("previewing json")
+    console.log(json)
+    timestamp, time_index = findTimestampInJSON(json)
 
     const data = {
         "message": pad(MAX_HEADER_PADDED_BYTES - message.length, message),
@@ -106,6 +128,7 @@ function createJWTJson(msg, mod, sig, addr, addr1) {
         "message_padded_bytes": message.length,
         "address": stringToAscii(addr), 
         "address_plus_one": stringToAscii(addr1), 
+        "exp_idx": 100,
         "domain_idx": 140,
         "domain": pad(30 - domain.length, domain)
     }
@@ -126,3 +149,5 @@ createJWTJson(
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB",
     "0x0ACBa2baA02F59D8a3d738d97008f909fB92e9FB"
 )
+
+createTypeJson(JSON.stringify({"iat": 1682580425, "exp": 1683216946, "azp": "xkQY1I0RgfxPhCNtJZ70cd8oTzymDT1r", "scope": "openid profile email"}))

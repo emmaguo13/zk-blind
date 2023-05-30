@@ -215,10 +215,10 @@ function getCircuitInputs(rsa_signature, rsa_modulus, msg, eth_address, circuit)
                     }
                     else {
                         assert(circuit === CircuitType.SHA, "Invalid circuit type");
-                        circuitInputs = {
-                            m: m,
-                            m_padded_bytes: m_padded_bytes
-                        };
+                        // circuitInputs = {
+                        //   m,
+                        //   m_padded_bytes,
+                        // };
                     }
                     return [2 /*return*/, {
                             circuitInputs: circuitInputs,
@@ -257,7 +257,7 @@ function generate_inputs() {
                     msg = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJzZWh5dW5AYmVya2VsZXkuZWR1IiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImdlb2lwX2NvdW50cnkiOiJVUyJ9LCJodHRwczovL2FwaS5vcGVuYWkuY29tL2F1dGgiOnsidXNlcl9pZCI6InVzZXIta1dMaXBzT3dMZFd4MXdMc0I3clR3UnFlIn0sImlzcyI6Imh0dHBzOi8vYXV0aDAub3BlbmFpLmNvbS8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExNjYwOTg2MjEwMzkxMTMwNjgwNyIsImF1ZCI6WyJodHRwczovL2FwaS5vcGVuYWkuY29tL3YxIiwiaHR0cHM6Ly9vcGVuYWkuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3MzE1NTQ0NiwiZXhwIjoxNjczNzYwMjQ2LCJhenAiOiJUZEpJY2JlMTZXb1RIdE45NW55eXdoNUU0eU9vNkl0RyIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgbW9kZWwucmVhZCBtb2RlbC5yZXF1ZXN0IG9yZ2FuaXphdGlvbi5yZWFkIG9mZmxpbmVfYWNjZXNzIn0";
                     message = Buffer.from(msg);
                     circuitType = CircuitType.JWT;
-                    pubkey = fs.readFileSync("./public_key.pem", {
+                    pubkey = fs.readFileSync("./headspace.pem", {
                     // encoding: "utf8",
                     // flag: "r",
                     });
@@ -332,7 +332,7 @@ if (typeof require !== "undefined" && require.main === module) {
     var circuitInputs = do_generate().then(function (res) {
         console.log("Writing to file...");
         console.log(res);
-        fs.writeFileSync("./jwt.json", JSON.stringify(res), { flag: "w" });
+        fs.writeFileSync("./headspace.json", JSON.stringify(res), { flag: "w" });
     });
     // gen_test();
 }
