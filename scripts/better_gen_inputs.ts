@@ -316,7 +316,7 @@ if (typeof require !== "undefined" && require.main === module) {
     const circuitInputs = generate_inputs().then((res) => {
       console.log("Writing to file...");
       console.log(res)
-      fs.writeFileSync(`./confusion.json`, JSON.stringify(res), { flag: "w" });
+      fs.writeFileSync(`../jwt1.json`, JSON.stringify(res), { flag: "w" });
     }
     );
     // gen_test();

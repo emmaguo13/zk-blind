@@ -1,6 +1,5 @@
 pragma circom 2.0.3;
 
-// include "../node_modules/circomlib/circuits/bitify.circom";
 include "./sha.circom";
 include "./rsa.circom";
 include "./base64.circom";
@@ -9,10 +8,9 @@ include "./jwt_type_regex.circom";
 include "./ascii.circom";
 include "./timestamp.circom";
 
-// k - bignum
 template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
-    signal input message[max_msg_bytes]; // TODO: header + . + payload. idk if it's k, we should pad this in javascript beforehand
-    signal input modulus[k]; // rsa pubkey, verified with smart contract + optional oracle
+    signal input message[max_msg_bytes]; 
+    signal input modulus[k]; // rsa pubkey
     signal input signature[k];
 
     signal input message_padded_bytes; // length of the message including the padding
@@ -159,8 +157,5 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
 
     less_exp_time.out === 1;
 }
-
-// In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.
-// This makes modulus and reveal_email_packed public. hash(signature) can optionally be made public, but is not recommended since it allows the mailserver to trace who the offender is.
 
 component main { public [ modulus, address, domain, time ] } = JWTVerify(1024, 766, 121, 17);

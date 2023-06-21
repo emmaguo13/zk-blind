@@ -57,7 +57,6 @@ contract Blind {
 
         // Domain
         for (uint256 i = 18; i < 47; i++) {
-            //domain.push(byte(input[i]));
             if (input[i] != uint256(0)) {
                 domain = abi.encodePacked(domain, byte(uint8(input[i])));
             }
