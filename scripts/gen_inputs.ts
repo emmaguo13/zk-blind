@@ -1,12 +1,12 @@
-import { shaHash } from "../helpers/shaHash";
+import { shaHash } from "./helpers/shaHash";
 import {
   bytesToBigInt,
   fromHex,
   toCircomBigIntBytes,
-} from "../helpers/binaryFormat";
+} from "./helpers/binaryFormat";
 import {
   MAX_MSG_PADDED_BYTES,
-} from "../helpers/constants";
+} from "./helpers/constants";
 import { Hash } from "./fast-sha256";
 const pki = require("node-forge").pki;
 import * as fs from "fs";
