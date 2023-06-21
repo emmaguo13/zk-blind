@@ -65,4 +65,13 @@ deploy blind and verifier contracts
 npx hardhat run ./scripts/deploy.js --network goerli
 ```
 
+## on-chain verification
 
+in our code, we have examples of verifying an OpenAI JWT on-chain. however, `./contracts/Blind.sol` and `./contracts/Verifier.sol` are not updated with the current state of the circuit, since our proof of concept app, Nozee, does not use on-chain verification.
+
+however, if you are interested in deploying on-chain, `./scripts/deploy.js` allows you to do a hardhat deploy, and `./test/blind.test.js` allows you to test in hardhat.
+
+run hardhat contract tests, first create a `secret.json` file that has a private key and goerli node provider endpoint.
+```
+yarn test
+```

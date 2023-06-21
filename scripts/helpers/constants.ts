@@ -9,9 +9,6 @@ export const CIRCOM_BIGINT_N = 121;
 export const CIRCOM_BIGINT_K = 17;
 export const CIRCOM_LEVELS = 30;
 
-// This is the string that comes right before the target string in the email. Ideally as close to the end of the email as possible.
-export const STRING_PRESELECTOR = 'meant for @';
-
 export const OPENAI_PUBKEY = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA27rOErDOPvPc3mOADYtQ
 BeenQm5NS5VHVaoO/Zmgsf1M0Wa/2WgLm9jX65Ru/K8Az2f4MOdpBxxLL686ZS+K
