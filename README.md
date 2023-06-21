@@ -6,14 +6,14 @@ post anonymous confessions about your work place / organization in zero-knowledg
 
 ## generate inputs
 
-generate inputs into `jwt.json`
+to generate inputs into `jwt.json`, replace `signature`, `msg`, and `ethAddress` in `node-ts scripts/gen_inputs.ts`. currently, this file will only generate inputs for OpenAI JWTs, but feel free to add more public keys to support JWTs from different sites.
 ```
-node scripts/generate_input.js
+node-ts scripts/gen_inputs.ts
 ``` 
 
 ## circuits 
 
-These circuits check for (1) valid rsa signature, (2) that the message is a JWT, and (3) ownership of a specific email domain.
+These circuits check for (1) valid rsa signature, (2) that the message is a JWT, (3) ownership of a specific email domain, and (4) JWT expiration.
 
 compile circuits in root project directory.
 ```
