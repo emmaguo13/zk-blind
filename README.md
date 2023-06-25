@@ -9,9 +9,9 @@ post anonymous confessions about your work place / organization in zero-knowledg
 to generate inputs into `jwt.json`, replace `signature`, `msg`, and `ethAddress` in `node-ts scripts/gen_inputs.ts`. currently, this file will only generate inputs for OpenAI JWTs, but feel free to add more public keys to support JWTs from different sites.
 ```
 node-ts scripts/gen_inputs.ts
-``` 
+```
 
-## circuits 
+## circuits
 
 These circuits check for (1) valid rsa signature, (2) that the message is a JWT, (3) ownership of a specific email domain, and (4) JWT expiration.
 
@@ -23,11 +23,6 @@ compile circuits in root project directory.
 generate witness
 ```
 ./shell_scripts/2_gen_wtns.sh
-```
-
-generate chunked zkeys
-```
-./shell_scripts/3_gen_chunk_zkey.sh
 ```
 
 phase 2 and getting full zkey + vkey
@@ -52,10 +47,10 @@ snarkjs groth16 verify ./build/jwt/verification_key.json ./build/jwt/public.json
 
 generate verifier.sol
 ```
-snarkjs zkey export solidityverifier ./build/jwt/jwt_single1.zkey Verifier.sol
+snarkjs zkey export solidityverifier ./build/jwt/jwt_single1.zkey contracts/Verifier.sol
 ```
 
-run local hardhat test 
+run local hardhat test
 ```
 npx hardhat test ./test/blind.test.js
 ```
@@ -67,9 +62,9 @@ npx hardhat run ./scripts/deploy.js --network goerli
 
 ## on-chain verification
 
-in our code, we have examples of verifying an OpenAI JWT on-chain. however, `./contracts/Blind.sol` and `./contracts/Verifier.sol` are not updated with the current state of the circuit, since our proof of concept app, Nozee, does not use on-chain verification.
+in our code, we have examples of verifying an OpenAI JWT on-chain. however, `./contracts/Blind.sol` is not updated with the current state of the circuit, since our proof of concept app, Nozee, does not use on-chain verification.
 
-however, if you are interested in deploying on-chain, `./scripts/deploy.js` allows you to do a hardhat deploy, and `./test/blind.test.js` allows you to test in hardhat.
+however, if you are interested in deploying on-chain, `./scripts/deploy.js` allows you to do a hardhat deploy, and `./test/blind.test.js` are examples of how we tested and deployed our previously working Blind.sol contract.
 
 run hardhat contract tests, first create a `secret.json` file that has a private key and goerli node provider endpoint.
 ```

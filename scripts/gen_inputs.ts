@@ -15,7 +15,6 @@ import * as fs from "fs";
 export async function generate_inputs(
   signature: string = "yjlOzb9yd8JGpvPGJK9uoVubC2Hy69dFizQTgQyXDjqN7cyhGkenxTXZefAD7PxI-TJ07E804H0zBf3Gfna3vnuo4ggqGvwYzSFW1U_YWgJisHc-gTFbNS5AUm6ha-rVDSpQ-yyC1bkErAShLtWBk35Cw3el27lcskv7C9dyperELb0bK9qjE_fdTFg5_jPv3qJp2cZPgOPPn83I1077WnYV2TCHK3K478Wfa8HfwsTh4KOYCF78ZPK0lBcABS1YxR5W_W94hDdzYdSu3J0L_g0jrbTsp6RYMdGcdGsrOQZkhqtpVj1YoKA6GVLgqC4biF5ahfj9ndZe7U7MxazCXg",
   msg: string = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJlbW1hZ3VvQGJlcmtlbGV5LmVkdSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS9hdXRoIjp7InVzZXJfaWQiOiJ1c2VyLUp4TW40YnljU3ZWMGhwY3dOZmtjRzRhWCJ9LCJpc3MiOiJodHRwczovL2F1dGgwLm9wZW5haS5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTQxNzEyMDg3OTkxMzA3NjAxNjYiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSIsImh0dHBzOi8vb3BlbmFpLm9wZW5haS5hdXRoMGFwcC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNjg1NDE1Mjk5LCJleHAiOjE2ODY2MjQ4OTksImF6cCI6IlRkSkljYmUxNldvVEh0Tjk1bnl5d2g1RTR5T282SXRHIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBtb2RlbC5yZWFkIG1vZGVsLnJlcXVlc3Qgb3JnYW5pemF0aW9uLnJlYWQgb3JnYW5pemF0aW9uLndyaXRlIn0",
-  ethAddress: string = "0x0000000000000000000000000000000000000000",
 ): Promise<any> {
   console.log("🚀 ~ signature", signature);
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"));
@@ -42,7 +41,6 @@ export async function generate_inputs(
     sig,
     modulus,
     message,
-    ethAddress,
     circuitType,
     period_idx_num,
     domain_idx_num,
@@ -58,8 +56,6 @@ export interface ICircuitInputs {
   message?: string[];
   modulus?: string[];
   signature?: string[];
-  address?: string;
-  address_plus_one?: string;
   message_padded_bytes?: string;
   period_idx?: string;
   domain_idx?: string;
@@ -194,7 +190,6 @@ export async function getCircuitInputs(
   rsa_signature: BigInt,
   rsa_modulus: BigInt,
   msg: Buffer,
-  eth_address: string,
   circuit: CircuitType,
   period_idx_num: BigInt,
   domain_idx_num: BigInt,
@@ -238,9 +233,9 @@ export async function getCircuitInputs(
   const shaOut = await partialSha(messagePadded, messagePaddedLen);
   assert(
     (await Uint8ArrayToString(shaOut)) ===
-      (await Uint8ArrayToString(
-        Uint8Array.from(await shaHash(prehashBytesUnpadded))
-      )),
+    (await Uint8ArrayToString(
+      Uint8Array.from(await shaHash(prehashBytesUnpadded))
+    )),
     "SHA256 calculation did not match!"
   );
 
@@ -257,18 +252,11 @@ export async function getCircuitInputs(
   const time = timestamp.toString();
   const time_idx = timestamp_idx_num.toString();
 
-  const address = bytesToBigInt(fromHex(eth_address)).toString();
-  const address_plus_one = (
-    bytesToBigInt(fromHex(eth_address)) + 1n
-  ).toString();
-
   const circuitInputs = {
     message,
     modulus,
     signature,
     message_padded_bytes,
-    address,
-    address_plus_one,
     period_idx,
     domain_idx,
     domain,
@@ -284,6 +272,6 @@ export async function getCircuitInputs(
 if (typeof require !== "undefined" && require.main === module) {
   const circuitInputs = generate_inputs().then((res) => {
     console.log("Writing to file...");
-    fs.writeFileSync(`../jwt.json`, JSON.stringify(res), { flag: "w" });
+    fs.writeFileSync(`./inputs/jwt.json`, JSON.stringify(res), { flag: "w" });
   });
 }

@@ -18,14 +18,14 @@ contract Blind {
         uint[48] memory input // Just the Hex representation of our public circuit inputs
         ) public {
 
-        // 0 to 16 modulus 
-        // 17 pubkey 
-        // 18 to 47 domain 
+        // 0 to 16 modulus
+        // 17 pubkey
+        // 18 to 47 domain
 
         // Verify Proof
         require(verifier.verifyProof(a, b, c, input) == true, "Proof failed to verify");
 
-        // Verify right address
+        // Verify right public key
         uint256[] memory openaiPubkey = new uint256[](17);
         openaiPubkey[0] = 0x0000000000000000000000000000000000c8430c6464e64ddda07a9b863d8881;
         openaiPubkey[1] = 0x0000000000000000000000000000000001cd0da2c4ae4218b0cade824b613b37;
