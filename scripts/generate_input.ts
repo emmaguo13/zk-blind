@@ -1,20 +1,24 @@
 import { shaHash } from "./helpers/shaHash";
 import {
-  bytesToBigInt,
-  fromHex,
   toCircomBigIntBytes,
 } from "./helpers/binaryFormat";
 import {
   MAX_MSG_PADDED_BYTES,
-  OPENAI_PUBKEY
+  OPENAI_PUBKEY,
+  JWT_CLIENT_PUBKEY
 } from "./helpers/constants";
 import { Hash } from "./fast-sha256";
 const pki = require("node-forge").pki;
 import * as fs from "fs";
 
 export async function generate_inputs(
-  signature: string = "yjlOzb9yd8JGpvPGJK9uoVubC2Hy69dFizQTgQyXDjqN7cyhGkenxTXZefAD7PxI-TJ07E804H0zBf3Gfna3vnuo4ggqGvwYzSFW1U_YWgJisHc-gTFbNS5AUm6ha-rVDSpQ-yyC1bkErAShLtWBk35Cw3el27lcskv7C9dyperELb0bK9qjE_fdTFg5_jPv3qJp2cZPgOPPn83I1077WnYV2TCHK3K478Wfa8HfwsTh4KOYCF78ZPK0lBcABS1YxR5W_W94hDdzYdSu3J0L_g0jrbTsp6RYMdGcdGsrOQZkhqtpVj1YoKA6GVLgqC4biF5ahfj9ndZe7U7MxazCXg",
-  msg: string = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJlbW1hZ3VvQGJlcmtlbGV5LmVkdSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS9hdXRoIjp7InVzZXJfaWQiOiJ1c2VyLUp4TW40YnljU3ZWMGhwY3dOZmtjRzRhWCJ9LCJpc3MiOiJodHRwczovL2F1dGgwLm9wZW5haS5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTQxNzEyMDg3OTkxMzA3NjAxNjYiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSIsImh0dHBzOi8vb3BlbmFpLm9wZW5haS5hdXRoMGFwcC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNjg1NDE1Mjk5LCJleHAiOjE2ODY2MjQ4OTksImF6cCI6IlRkSkljYmUxNldvVEh0Tjk1bnl5d2g1RTR5T282SXRHIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBtb2RlbC5yZWFkIG1vZGVsLnJlcXVlc3Qgb3JnYW5pemF0aW9uLnJlYWQgb3JnYW5pemF0aW9uLndyaXRlIn0",
+  // signature: string = "yjlOzb9yd8JGpvPGJK9uoVubC2Hy69dFizQTgQyXDjqN7cyhGkenxTXZefAD7PxI-TJ07E804H0zBf3Gfna3vnuo4ggqGvwYzSFW1U_YWgJisHc-gTFbNS5AUm6ha-rVDSpQ-yyC1bkErAShLtWBk35Cw3el27lcskv7C9dyperELb0bK9qjE_fdTFg5_jPv3qJp2cZPgOPPn83I1077WnYV2TCHK3K478Wfa8HfwsTh4KOYCF78ZPK0lBcABS1YxR5W_W94hDdzYdSu3J0L_g0jrbTsp6RYMdGcdGsrOQZkhqtpVj1YoKA6GVLgqC4biF5ahfj9ndZe7U7MxazCXg",
+  // msg: string = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik1UaEVOVUpHTkVNMVFURTRNMEZCTWpkQ05UZzVNRFUxUlRVd1FVSkRNRU13UmtGRVFrRXpSZyJ9.eyJodHRwczovL2FwaS5vcGVuYWkuY29tL3Byb2ZpbGUiOnsiZW1haWwiOiJlbW1hZ3VvQGJlcmtlbGV5LmVkdSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS9hdXRoIjp7InVzZXJfaWQiOiJ1c2VyLUp4TW40YnljU3ZWMGhwY3dOZmtjRzRhWCJ9LCJpc3MiOiJodHRwczovL2F1dGgwLm9wZW5haS5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTQxNzEyMDg3OTkxMzA3NjAxNjYiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS92MSIsImh0dHBzOi8vb3BlbmFpLm9wZW5haS5hdXRoMGFwcC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNjg1NDE1Mjk5LCJleHAiOjE2ODY2MjQ4OTksImF6cCI6IlRkSkljYmUxNldvVEh0Tjk1bnl5d2g1RTR5T282SXRHIiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBtb2RlbC5yZWFkIG1vZGVsLnJlcXVlc3Qgb3JnYW5pemF0aW9uLnJlYWQgb3JnYW5pemF0aW9uLndyaXRlIn0",
+  // signer: string = "OPENAI"
+
+  signature: string = "hi0TaowIDbmo-MlHUxsgwxxLaJthvWo6QC990ix8dLMGExozkZLRwZhUFRpvx6gVDg55pSAjjiRVAfwZ9E4UKduhO5QE9bt6dI9_VZgyKoadolHJDjivPnQElhIhd2gqTtH_fovf1-hAzkExlPCZYX1icbPcpU9dQrkV3lzzLG4QwfDaux3mcmMwCifQEYdqpqpf9z2oQpvp5z9tbIOTakupTBMPxS2eLwQbIo3IjM3BHdetqNfPZBmb5MPIw6wWN4-dDGyo1Z-ODw5LmPOYY1Cuqpr3w3bBzytt8K-PTvtfpEGiPLFk7DXQNDRY5n8s29V-derC4SBY0lqfBg3miQ",
+  msg: string = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtbWFndW9AYmVya2VsZXkuZWR1IiwiaWF0IjoxNjg4MjQyNDMyLCJpc3MiOiJ1cm46ZXhhbXBsZTppc3N1ZXIiLCJhdWQiOiJ1cm46ZXhhbXBsZTphdWRpZW5jZSIsImV4cCI6MTY4ODI0OTYzMn0",
+  signer: string = "JWT_CLIENT"
 ): Promise<any> {
   console.log("🚀 ~ signature", signature);
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"));
@@ -30,9 +34,13 @@ export async function generate_inputs(
   const timestamp = BigInt(timeStr);
   const timestamp_idx_num = BigInt(timestamp_idx ?? 0);
 
-  const circuitType = CircuitType.JWT;
+  let currentKey;
 
-  const currentKey = OPENAI_PUBKEY;
+  if (signer == "JWT_CLIENT") {
+    currentKey = JWT_CLIENT_PUBKEY;
+  } else if (signer == "OPENAI") {
+    currentKey = OPENAI_PUBKEY
+  }
 
   const pubKeyData = pki.publicKeyFromPem(currentKey);
 
@@ -41,7 +49,6 @@ export async function generate_inputs(
     sig,
     modulus,
     message,
-    circuitType,
     period_idx_num,
     domain_idx_num,
     domain,
@@ -62,12 +69,6 @@ export interface ICircuitInputs {
   domain?: string[];
   timestamp?: string;
   timestamp_idx?: string;
-}
-enum CircuitType {
-  RSA = "rsa",
-  SHA = "sha",
-  TEST = "test",
-  JWT = "jwt",
 }
 
 function assert(cond: boolean, errorMessage: string) {
@@ -190,7 +191,6 @@ export async function getCircuitInputs(
   rsa_signature: BigInt,
   rsa_modulus: BigInt,
   msg: Buffer,
-  circuit: CircuitType,
   period_idx_num: BigInt,
   domain_idx_num: BigInt,
   domain_raw: Buffer,
@@ -272,6 +272,6 @@ export async function getCircuitInputs(
 if (typeof require !== "undefined" && require.main === module) {
   const circuitInputs = generate_inputs().then((res) => {
     console.log("Writing to file...");
-    fs.writeFileSync(`./inputs/jwt.json`, JSON.stringify(res), { flag: "w" });
+    fs.writeFileSync(`./inputs/jwt_client.json`, JSON.stringify(res), { flag: "w" });
   });
 }
