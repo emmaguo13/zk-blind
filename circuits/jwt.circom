@@ -1,8 +1,8 @@
 pragma circom 2.0.3;
 
-include "./sha.circom";
-include "./rsa.circom";
-include "./base64.circom";
+include "@zk-email/circuits/helpers/base64.circom";
+include "@zk-email/circuits/helpers/sha.circom";
+include "@zk-email/circuits/helpers/rsa.circom";
 include "./jwt_email_regex.circom";
 include "./jwt_type_regex.circom";
 include "./ascii.circom";

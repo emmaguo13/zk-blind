@@ -21,6 +21,8 @@
   "dependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
+    "@zk-email/circuits": "^3.2.0",
+    "@zk-email/zk-regex-circom": "^1.2.1",
     "cryo": "^0.0.6",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.7.2",
