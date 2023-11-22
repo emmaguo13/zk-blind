@@ -1,8 +1,9 @@
-pragma circom 2.0.3;
+pragma circom 2.1.5;
 
 include "@zk-email/circuits/helpers/base64.circom";
 include "@zk-email/circuits/helpers/sha.circom";
 include "@zk-email/circuits/helpers/rsa.circom";
+include "@zk-email/circuits/helpers/extract.circom"; // For VarShiftMaskedStr
 include "./jwt_email_regex.circom";
 include "./jwt_type_regex.circom";
 include "./ascii.circom";

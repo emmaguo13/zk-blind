@@ -5,6 +5,7 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.3.7",
+    "circom_tester": "^0.0.20",
     "circomlib": "^2.0.3",
     "circomlibjs": "^0.1.7",
     "hardhat": "^2.12.5",
