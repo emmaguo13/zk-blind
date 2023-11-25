@@ -19,7 +19,7 @@ export async function generate_inputs(
   signature: string = "hi0TaowIDbmo-MlHUxsgwxxLaJthvWo6QC990ix8dLMGExozkZLRwZhUFRpvx6gVDg55pSAjjiRVAfwZ9E4UKduhO5QE9bt6dI9_VZgyKoadolHJDjivPnQElhIhd2gqTtH_fovf1-hAzkExlPCZYX1icbPcpU9dQrkV3lzzLG4QwfDaux3mcmMwCifQEYdqpqpf9z2oQpvp5z9tbIOTakupTBMPxS2eLwQbIo3IjM3BHdetqNfPZBmb5MPIw6wWN4-dDGyo1Z-ODw5LmPOYY1Cuqpr3w3bBzytt8K-PTvtfpEGiPLFk7DXQNDRY5n8s29V-derC4SBY0lqfBg3miQ",
   msg: string = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtbWFndW9AYmVya2VsZXkuZWR1IiwiaWF0IjoxNjg4MjQyNDMyLCJpc3MiOiJ1cm46ZXhhbXBsZTppc3N1ZXIiLCJhdWQiOiJ1cm46ZXhhbXBsZTphdWRpZW5jZSIsImV4cCI6MTY4ODI0OTYzMn0",
   signer: string = "JWT_CLIENT"
-): Promise<any> {
+): Promise<ICircuitInputs> {
   console.log("🚀 ~ signature", signature);
   const sig = BigInt("0x" + Buffer.from(signature, "base64").toString("hex"));
   const message = Buffer.from(msg);
@@ -67,8 +67,8 @@ export interface ICircuitInputs {
   period_idx?: string;
   domain_idx?: string;
   domain?: string[];
-  timestamp?: string;
-  timestamp_idx?: string;
+  time?: string;
+  time_idx?: string;
 }
 
 function assert(cond: boolean, errorMessage: string) {
@@ -187,6 +187,14 @@ async function partialSha(
   return await shaGadget.update(msg, msgLen).cacheState();
 }
 
+export interface CircuitInputsResponse {
+  valid: {
+    validSignatureFormat?: boolean;
+    validMessage?: boolean;
+  };
+  circuitInputs: ICircuitInputs;
+}
+
 export async function getCircuitInputs(
   rsa_signature: BigInt,
   rsa_modulus: BigInt,
@@ -196,13 +204,7 @@ export async function getCircuitInputs(
   domain_raw: Buffer,
   timestamp: BigInt,
   timestamp_idx_num: BigInt
-): Promise<{
-  valid: {
-    validSignatureFormat?: boolean;
-    validMessage?: boolean;
-  };
-  circuitInputs: ICircuitInputs;
-}> {
+): Promise<CircuitInputsResponse> {
   const modulusBigInt = rsa_modulus;
   // Message is the header + payload
   const prehash_message_string = msg;
