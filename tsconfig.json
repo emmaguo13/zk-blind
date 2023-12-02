@@ -21,13 +21,14 @@
       "noEmit": true,
       "jsx": "react-jsx",
       "types": [
-        "node"
+        "node", "jest"
       ],
       "incremental": true
     },
     "include": [
       "src",
-      "circuits/scripts/"
+      "circuits/scripts/",
+      "declarations.d.ts",
     ],
     "exclude": [
       "node_modules"

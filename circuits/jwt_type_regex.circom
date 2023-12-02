@@ -1,4 +1,6 @@
-include "./regex_helpers.circom";
+pragma circom 2.1.5;
+
+include "@zk-email/zk-regex-circom/circuits/regex_helpers.circom";
 
 /* tests whether jwt type detected */
 template MessageType(max_json_bytes) {

@@ -1,8 +1,10 @@
-pragma circom 2.0.3;
+pragma circom 2.1.5;
 
-include "./sha.circom";
-include "./rsa.circom";
-include "./base64.circom";
+// Circuits originally 1159565
+include "./base64.circom"; // Adds 2046 constraints
+include "@zk-email/circuits/helpers/sha.circom";
+include "@zk-email/circuits/helpers/rsa.circom";
+include "@zk-email/circuits/helpers/extract.circom"; // For VarShiftLeft and VarShiftMaskedStr
 include "./jwt_email_regex.circom";
 include "./jwt_type_regex.circom";
 include "./ascii.circom";
@@ -22,7 +24,7 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     signal reveal_timestamp[max_timestamp_len][max_json_bytes];
 
     signal input domain_idx; // index of email domain in message
-    signal input domain[max_domain_len]; // input domain with padding
+    // signal input domain[max_domain_len]; // input domain with padding
     signal reveal_email[max_domain_len][max_json_bytes]; // reveals found email domain
 
     signal input time_idx; // index of expiration timestamp
@@ -83,11 +85,11 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     /************************** JWT REGEXES *****************************/
 
     /* ensures signature is type jwt */
-    component type_jwt_regex = MessageType(max_json_bytes);
-    for (var i = 0; i < max_json_bytes; i++) {
-        type_jwt_regex.msg[i] <== message_b64.out[i];
-    }
-    type_jwt_regex.out === 1;
+    // component type_jwt_regex = MessageType(max_json_bytes);
+    // for (var i = 0; i < max_json_bytes; i++) {
+    //     type_jwt_regex.msg[i] <== message_b64.out[i];
+    // }
+    // type_jwt_regex.out === 1;
 
     // /* ensures an email in json found */
     component email_regex = EmailDomain(max_json_bytes);
@@ -96,28 +98,11 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     }
     email_regex.out === 1;
 
-    // isolate where email domain index is
-    component email_eq[max_json_bytes];
-    for (var i = 0; i < max_json_bytes; i++) {
-        email_eq[i] = IsEqual();
-        email_eq[i].in[0] <== i;
-        email_eq[i].in[1] <== domain_idx;
-    }
-
-    // shifts email domain to start of string
-    for (var j = 0; j < max_domain_len; j++) {
-        reveal_email[j][j] <== email_eq[j].out * email_regex.reveal[j];
-        for (var i = j + 1; i < max_json_bytes; i++) {
-            reveal_email[j][i] <== reveal_email[j][i - 1] + email_eq[i-j].out * email_regex.reveal[i];
-        }
-    }
-
-    // constrain the found email domain and passed email domain
-    for (var i = 0; i < max_domain_len; i++) {
-        domain[i] === reveal_email[i][max_json_bytes - 1];
-    }
+    // From 20K constraints to 13K constraints
+    signal output domain[max_domain_len] <== VarShiftMaskedStr(max_json_bytes, max_domain_len)(email_regex.reveal0, domain_idx);
 
     // check expiration date is found
+    // Updating this regex reduced it 8K, from 1,112,569 to 1,104,851 constraints
     component time_regex = Timestamp(max_json_bytes);
     for (var i = 0; i < max_json_bytes; i++) {
         time_regex.msg[i] <== message_b64.out[i];
@@ -131,7 +116,6 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
         exp_eq[i].in[0] <== i;
         exp_eq[i].in[1] <== time_idx;
     }
-
     // shifts timestamp to start of string
     for (var j = 0; j < max_timestamp_len; j++) {
         reveal_timestamp[j][j] <== exp_eq[j].out * time_regex.reveal[j];
@@ -142,6 +126,9 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
 
     // convert to number
     component time_num = AsciiToNum(max_timestamp_len);
+    // signal time_reveal[max_timestamp_len] <== VarShiftMaskedStr(max_json_bytes, max_timestamp_len)(time_regex.reveal, time_idx);
+    // time_num.in <== time_reveal;
+    // <== VarShiftMaskedStr(max_json_bytes, max_timestamp_len)(reveal_timestamp, time_idx);
     for (var j = 0; j < max_timestamp_len; j++) {
         time_num.in[j] <== reveal_timestamp[j][max_json_bytes -1];
     }
@@ -155,4 +142,4 @@ template JWTVerify(max_msg_bytes, max_json_bytes, n, k) {
     less_exp_time.out === 1;
 }
 
-component main { public [ modulus, domain, time ] } = JWTVerify(1024, 766, 121, 17);
+component main { public [ modulus, time ] } = JWTVerify(1024, 766, 121, 17);
